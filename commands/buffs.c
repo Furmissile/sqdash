@@ -37,19 +37,19 @@ struct discord_component select_materials(
 
     switch (*rune_type) {
       case ACUITY_ACORN:
-        player.buffs.acuity_acorn += ((button_index +1) * MATERIAL_FACTOR);
+        player.buffs.acuity_acorn += ((button_index +1) * (MATERIAL_FACTOR));
         break;
       case ENDURANCE_ACORN:
-        player.buffs.endurance_acorn = (((button_index +1) * MATERIAL_FACTOR));
+        player.buffs.endurance_acorn += ((button_index +1) * (MATERIAL_FACTOR));
         break;
       case LUCK_ACORN:
-        player.buffs.luck_acorn += ((button_index +1) * MATERIAL_FACTOR);
+        player.buffs.luck_acorn += ((button_index +1) * (MATERIAL_FACTOR));
         break;
       case PROFICIENCY_ACORN:
-        player.buffs.proficiency_acorn += ((button_index +1) * MATERIAL_FACTOR);
+        player.buffs.proficiency_acorn += ((button_index +1) * (MATERIAL_FACTOR));
         break;
       case SMELL_ACORN:
-        player.buffs.smell_acorn += ((button_index +1) * MATERIAL_FACTOR);
+        player.buffs.smell_acorn += ((button_index +1) * (MATERIAL_FACTOR));
         break;
       default:
         printf("\n\nThis buff doesnt exist! \n\n");

@@ -15,6 +15,7 @@ struct discord_component seedy_purchase(
 
   //if there's a custom id, this is a response
   if (event->data->custom_id
+    && event->data->custom_id[1] -48 == current_material
     && player.golden_acorns > seedy_price)
   {
     player.golden_acorns -= seedy_price;
