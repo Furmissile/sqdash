@@ -150,7 +150,7 @@ void generate_rewards(
         ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION,
             "\n+**%d** <:%s:%ld> %s \n", 
             rewards.biome_material,
-            biome_material_file.file_path, biome_material_file.emoji_id, biome_material_file.formal_name);
+            biome_material_file.emoji_name, biome_material_file.emoji_id, biome_material_file.formal_name);
       }
       break;
     default:
@@ -320,6 +320,9 @@ void main_embed(
 
   struct File biome_file = biomes[player.biome].biome_scene;
   embed->image = discord_set_embed_image( fill_git_url(biome_file.file_path) );
+
+  if (embed->thumbnail)
+    printf("%s \n", embed->thumbnail->url);
 }
 
 /* Listens for slash command interactions */

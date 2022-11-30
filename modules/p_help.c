@@ -21,6 +21,8 @@ void p_help(struct Message *discord_msg)
 
   embed->title = format_str(SIZEOF_TITLE, "Player Help");
 
+  embed->color = (int)strtol("F0C318", NULL, 16);
+
   embed->description = format_str(SIZEOF_DESCRIPTION,
       "Looking for help? Check out the info below to see if they answer your questions! \n"
       "Need help with purchases? Request the embed and it will explain how it works!");

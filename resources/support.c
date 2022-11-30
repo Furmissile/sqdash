@@ -28,6 +28,8 @@ void create_rules(struct discord *client, const struct discord_message *event)
 
   embed->title = format_str(SIZEOF_TITLE, "Rules");
 
+  embed->color = (int)strtol("0EDF0A", NULL, 16);
+
   embed->description = format_str(SIZEOF_DESCRIPTION, "Before we get started, lets lay dowm some rules first. \n");
 
   embed->fields = calloc(1, sizeof(struct discord_embed_fields));
@@ -37,12 +39,12 @@ void create_rules(struct discord *client, const struct discord_message *event)
   embed->fields->array[R_RESPECT].name = format_str(SIZEOF_TITLE, ""ACORNS" Respect "ACORNS"");
   embed->fields->array[R_RESPECT].value = format_str(SIZEOF_FIELD_VALUE,
       " "OFF_ARROW" Please treat others with respect and be mindful of the things you say. \n\
-      "OFF_ARROW" Hate speech, violent or obscene comments, and otherwise inappropriate or invasive behavior not tolerated.");
+      "OFF_ARROW" Hate speech, violent or obscene comments, and otherwise inappropriate or invasive behavior are not tolerated.");
 
   embed->fields->array[R_CONTENT].name = format_str(SIZEOF_TITLE, ""ACORNS" Content "ACORNS"");
   embed->fields->array[R_CONTENT].value = format_str(SIZEOF_FIELD_VALUE,
       " "OFF_ARROW" Be mindful of the content posted and be sure the right channels are used. \n\
-      "OFF_ARROW" This means no harmful links, spamming, malware, or adult content (NSFW).");
+      "OFF_ARROW" This means no harmful links and malware, spamming, or adult content (NSFW).");
 
   embed->fields->array[R_POLICY].name = format_str(SIZEOF_TITLE, ""ACORNS" Bot Policy "ACORNS"");
   embed->fields->array[R_POLICY].value = format_str(SIZEOF_FIELD_VALUE,
@@ -157,10 +159,12 @@ void create_verify(struct discord *client, const struct discord_message *event)
   // load details
   embed->title = format_str(SIZEOF_TITLE, "Please Verify");
 
+  embed->color = (int)strtol("00ff00", NULL, 16);
+
   embed->thumbnail = discord_set_embed_thumbnail(fill_git_url(squirrels[GRAY_SQUIRREL].file_path) );
 
   embed->description = format_str(SIZEOF_DESCRIPTION, "By reacting to this message, you have read and agree to the server rules. \n\
-      Please react with thr Acorn "ACORNS" emoji to be able to chat. No other emoji will work!");
+      Please react with the Acorn "ACORNS" emoji to be able to chat. No other emoji will work!");
 
   discord_create_message(client, event->channel_id,
     &(struct discord_create_message)

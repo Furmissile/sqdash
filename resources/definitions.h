@@ -413,7 +413,7 @@ const struct Biome *biomes = (struct Biome[])
       {
         .name = "Desolate Plains: Suspicious Crops",
         .conflict = "Unlike the other crops, this one is sticky...",
-        .file_path = "GRASSLANDS%20CONTENT/Encounters/poisoned crop.png",
+        .file_path = "GRASSLANDS%20CONTENT/Encounters/poisoned_crop.png",
 
         .solution = {"Walk away", "Try a kernel", "Wipe off the poison in hopes there's no trace"}
       },
