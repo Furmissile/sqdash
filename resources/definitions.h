@@ -357,6 +357,8 @@ const struct Biome *biomes = (struct Biome[])
       .emoji_id = 1007390631016017991
     },
 
+    // TODO:
+    // .biome_scene = "GRASSLANDS%20CONTENT/Utils/grasslands_scene.gif",
     .biome_scene = {
       .file_path = "GRASSLANDS%20CONTENT/Utils/grasslands_scene.gif"
     },

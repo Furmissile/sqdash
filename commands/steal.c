@@ -3,7 +3,7 @@
   This file handles acorn stealing
   - A random player is selected from the query
   - Players gain acorns and the victim loses acorns based on their level
-  - If the player has more acorns than needed ? subtract acorns and add lucky coins : set to 0
+  - If the player has more acorns than needed ? subtract acorns and add golden acorns : set to 0
   - If the steal failed, the player is notified, otherwise the steal is anonymous!
   - There should be a 50% chance to successfully steal another player's acorns
 
@@ -22,8 +22,11 @@ void steal_acorns(struct Message *discord_msg)
 {
   struct discord_embed *embed = discord_msg->embed;
 
-  PGresult* t_user = SQL_query("select user_id, p_level, acorns from public.player where user_id != %ld and scurry_id != %ld", 
-      player.user_id, player.scurry_id);
+  PGresult* t_user = (player.scurry_id > 0) ?
+      SQL_query("select user_id, p_level, acorns from public.player where user_id != %ld and scurry_id != %ld", 
+      player.user_id, player.scurry_id)
+      : SQL_query("select user_id, p_level, acorns from public.player where user_id != %ld", 
+      player.user_id);
 
   int selected_player = genrand(0, PQntuples(t_user) -1);
   int base_value = genrand(50, MAX_CHANCE);
@@ -36,7 +39,7 @@ void steal_acorns(struct Message *discord_msg)
     embed->title = format_str(SIZEOF_TITLE, "Steal Failed!");
     discord_msg->content = format_str(SIZEOF_DESCRIPTION, "<@!%ld>, someone failed to snatch your acorns!", t_player_id);
     embed->description = format_str(SIZEOF_DESCRIPTION, 
-        "<@!%ld> failed to steal %d acorns! \n\n-**10** "ENERGY" Energy", 
+        "<@!%ld> failed to steal **%d** acorns! \n\n-**10** "ENERGY" Energy", 
         player.user_id, stolen_acorns);
   }
   else {
@@ -57,10 +60,10 @@ void steal_acorns(struct Message *discord_msg)
     embed->color = (int)ACTION_SUCCESS;
     embed->title = format_str(SIZEOF_TITLE, "Steal Successful!");
     embed->description = format_str(SIZEOF_DESCRIPTION,
-        "You anonymously stole %d acorns! \n"
-        "+**%d** "GOLDEN_ACORNS" Lucky Coins \n"
-        "\n\n-**%d** "ENERGY" Energy",
-        STEAL_ENERGY_COST, stolen_acorns, golden_acorns);
+        "You anonymously stole **%d** acorns! \n"
+        "+**%d** "GOLDEN_ACORNS" Golden Acorns \n"
+        "\n-**%d** "ENERGY" Energy",
+        stolen_acorns, golden_acorns, STEAL_ENERGY_COST);
   }
   
   if (player.user_id != OWNER_ID)

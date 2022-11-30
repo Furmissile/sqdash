@@ -128,7 +128,7 @@ void check_level(struct Message *discord_msg)
         "\n"STAHR" You have reached level **%d**! \n", player.level);
     
     struct File biome_icon = biomes[player.biome +1].biome_icon;
-    if ((player.level - 20) % 10 == 0)
+    if (player.level > 20 && (player.level - 20) % 10 == 0)
       ADD_TO_BUFFER(embed->description, SIZEOF_DESCRIPTION, 
           "\nYou have reached the <:%s:%ld> **%s**! \nCheck out `/info` for more! \n",
           biome_icon.emoji_name, biome_icon.emoji_id, biome_icon.formal_name);
