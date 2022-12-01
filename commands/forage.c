@@ -318,8 +318,7 @@ void main_embed(
     discord_msg->buttons = build_buttons(event, 3, TYPE_DIRT_PILE, TYPE_MAIN_MSG);
   }
 
-  struct File biome_file = biomes[player.biome].biome_scene;
-  embed->image = discord_set_embed_image( fill_git_url(biome_file.file_path) );
+  embed->image = discord_set_embed_image( fill_git_url(biomes[player.biome].biome_scene_path) );
 
   if (embed->thumbnail)
     printf("%s \n", embed->thumbnail->url);

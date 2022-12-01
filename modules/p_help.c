@@ -24,8 +24,8 @@ void p_help(struct Message *discord_msg)
   embed->color = (int)strtol("F0C318", NULL, 16);
 
   embed->description = format_str(SIZEOF_DESCRIPTION,
-      "Looking for help? Check out the info below to see if they answer your questions! \n"
-      "Need help with purchases? Request the embed and it will explain how it works!");
+      "Looking for help? Check out the info below to see if you're question can be answered! \n"
+      "Need help with purchases? Request the respective embed and it will explain how it works!");
 
   embed->fields = calloc(1, sizeof(struct discord_embed_fields));
   embed->fields->size = TOPIC_SIZE;
@@ -39,24 +39,24 @@ void p_help(struct Message *discord_msg)
 
   embed->fields->array[TOPIC_MATERIALS].name = format_str(SIZEOF_TITLE, ""ACORNS" Materials vs Biome Materials "ACORNS"");
   embed->fields->array[TOPIC_MATERIALS].value = format_str(SIZEOF_FIELD_VALUE,
-      " "OFF_ARROW" Seeds "SEEDS" and pine cones "PINE_CONES" can be found *anywhere* whereas biome materials are unique to their biome. \n"
-      " "OFF_ARROW" Seeds "SEEDS" are used for enchanted acorns and pine cones "PINE_CONES" are used for stat upgrades. \n"
+      " "OFF_ARROW" Seeds "SEEDS" and pine cones "PINE_CONES" can be found *anywhere* whereas biome materials are biome-specific. \n"
+      " "OFF_ARROW" Seeds are used for enchanted acorns and pine cones are used for stat upgrades. \n"
       " "OFF_ARROW" Biome materials are used for various purchases.");
 
   embed->fields->array[TOPIC_PROGRESSION].name = format_str(SIZEOF_TITLE, ""ACORNS" Biome Progression "ACORNS"");
   embed->fields->array[TOPIC_PROGRESSION].value = format_str(SIZEOF_FIELD_VALUE,
       " "OFF_ARROW" You must reach a certain level "STAHR" to explore the next biome. \n"
-      " "OFF_ARROW" The associated biome material will come up in your player info. Just send `/info` to check!");
+      " "OFF_ARROW" The associated biome material will come up in your player info. Send `/info` to check!");
 
   embed->fields->array[TOPIC_CHANGE_COLOR].name = format_str(SIZEOF_TITLE, ""ACORNS" Changing Message Color "ACORNS"");
   embed->fields->array[TOPIC_CHANGE_COLOR].value = format_str(SIZEOF_FIELD_VALUE,
-      " "OFF_ARROW" The color of your embed can be changed by inputing a hex value into `/colorchange`. \n"
-      " "OFF_ARROW" Looking for a hex color? Check out this [link](https://htmlcolorcodes.com/color-picker/) for reference!");
+      " "OFF_ARROW" The color of your embed can be changed by inputing a hex value into `/color`. \n"
+      " "OFF_ARROW" Looking for a hex color? Check out this [**link**](https://htmlcolorcodes.com/color-picker/) for reference!");
 
   embed->fields->array[TOPIC_STEAL].name = format_str(SIZEOF_TITLE, ""ACORNS" Stealing Player Acorns "ACORNS"");
   embed->fields->array[TOPIC_STEAL].value = format_str(SIZEOF_FIELD_VALUE,
-      " "OFF_ARROW" Stealing from other players gives acorns "ACORNS" and golden acorns "GOLDEN_ACORNS". \n"
-      " "OFF_ARROW" Golden acorns "GOLDEN_ACORNS" can be spend on materials from the Seedy Market. Check it out using `/seedy_market`! \n");
+      " "OFF_ARROW" Stealing from other players gives acorns and golden acorns. \n"
+      " "OFF_ARROW" Golden acorns can be spent on materials from the **Seedy Market**. Check it out using `/seedy_market`! \n");
   
   embed->footer = discord_set_embed_footer("Happy Foraging!",
       fill_git_url(items[ITEM_ACORNS].file_path) );

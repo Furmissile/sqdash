@@ -12,6 +12,7 @@
 enum E_TOPIC {
   E_TOPIC_GOLDEN_ACORNS,
   E_TOPIC_SEASONS,
+  E_TOPIC_FUTURE,
   E_TOPIC_SIZE
 };
 
@@ -20,6 +21,8 @@ void e_help(struct Message *discord_msg)
   struct discord_embed *embed = discord_msg->embed;
 
   embed->title = format_str(SIZEOF_TITLE, "Event Help");
+
+  embed->color = (int)strtol("F0C318", NULL, 16);
 
   embed->description = format_str(SIZEOF_DESCRIPTION,
       "Looking for help on how events work? Check out the info below \n"
@@ -35,9 +38,13 @@ void e_help(struct Message *discord_msg)
 
   embed->fields->array[E_TOPIC_SEASONS].name = format_str(SIZEOF_TITLE, ""GOLDEN_ACORNS" Seasons "GOLDEN_ACORNS"");
   embed->fields->array[E_TOPIC_SEASONS].value = format_str(SIZEOF_DESCRIPTION,
-      " "OFF_ARROW" Seasons change weekly and occur passively. Each season gives a different boost to acorn "ACORNS" gains. \n"
+      " "OFF_ARROW" Seasons weekly change and passively occur. Each season gives a different boost to acorn "ACORNS" gains. \n"
       " "OFF_ARROW" Seasons include Spring (+**20**%%), Summer (+**10**%%), Fall (+**5**%%), and Winter (No boost). \n"
       " "OFF_ARROW" Send `/season_info` to find out when the current season ends! \n");
+  
+  embed->fields->array[E_TOPIC_FUTURE].name = format_str(SIZEOF_TITLE, ""GOLDEN_ACORNS" Future Events "GOLDEN_ACORNS"");
+  embed->fields->array[E_TOPIC_FUTURE].value = format_str(SIZEOF_DESCRIPTION,
+      " "OFF_ARROW" Future events will be listed here!");
 
   embed->footer = discord_set_embed_footer("Happy Foraging!",
       fill_git_url(items[ITEM_GOLDEN_ACORN].file_path) );

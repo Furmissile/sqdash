@@ -28,6 +28,8 @@ void s_help(struct Message *discord_msg)
 
   embed->title = format_str(SIZEOF_TITLE, "Scurry Help");
 
+  embed->color = (int)strtol("F0C318", NULL, 16);
+
   embed->description = format_str(SIZEOF_DESCRIPTION,
       "Looking for help on what scurries are about? Check out the info below \n"
       "to see if they answer your questions!");
@@ -36,32 +38,34 @@ void s_help(struct Message *discord_msg)
   embed->fields->size = S_TOPIC_SIZE;
   embed->fields->array = calloc(S_TOPIC_SIZE, sizeof(struct discord_embed_field));
 
-  embed->fields->array[S_TOPIC_UTILS].name = format_str(SIZEOF_TITLE, ""OPPOSING_SCURRY" Scurry Utils "OPPOSING_SCURRY"");
+  embed->fields->array[S_TOPIC_UTILS].name = format_str(SIZEOF_TITLE, ""GUILD_ICON" Scurry Utils "GUILD_ICON"");
   embed->fields->array[S_TOPIC_UTILS].value = format_str(SIZEOF_FIELD_VALUE, 
-      " "OFF_ARROW" Member invites come in through DM. Press a button to accept or decline. But Plan accordingly because invites expire in **2** minutes! \n"
-      " "OFF_ARROW" Only the owner can kick a member. Simply follow up `/scurry_kick` with `yes` to verify! \n"
-      " "OFF_ARROW" Members can leave on their own prerogative using `/scurry_kick`. **Please know that your stats related to the scurry will not carry over!**");
+      " "OFF_ARROW" Member invites come in through DM. Press a button to accept or decline. Plan accordingly because invites expire in **2** minutes! \n"
+      " "OFF_ARROW" Only the owner "LEADER" can kick a member. Simply follow up `/scurry_kick` with the user mention to kick! \n"
+      " "OFF_ARROW" Members can leave on their own prerogative too using `/scurry_leave`. \n"
+      "**Please know that your stats related to the scurry will not carry over!**");
   
-  embed->fields->array[S_TOPIC_WARS].name = format_str(SIZEOF_TITLE, ""OPPOSING_SCURRY" Scurry Wars "OPPOSING_SCURRY"");
+  embed->fields->array[S_TOPIC_WARS].name = format_str(SIZEOF_TITLE, ""GUILD_ICON" Scurry Wars "GUILD_ICON"");
   embed->fields->array[S_TOPIC_WARS].value = format_str(SIZEOF_FIELD_VALUE,
       " "OFF_ARROW" Courage "COURAGE" is the main scurry war currency that is obtained from stealing other scurries' war acorns. \n"
-      " "OFF_ARROW" To join the arena, scurries need their war stash full and have at least 5 members present! \n"
-      " "OFF_ARROW" Scurries have the option to retreat at any point, but be aware your courage still becomes your score! \n");
+      " "OFF_ARROW" Any scurry current in the arena has the chance to steal from your war stash! \n"
+      " "OFF_ARROW" To join the arena (found in scurry info), scurries need their war stash "LOST_STASH" full and have at least 5 members present! \n");
   
-  embed->fields->array[S_TOPIC_AFTERMATH].name = format_str(SIZEOF_TITLE, ""OPPOSING_SCURRY" Arena Aftermath "OPPOSING_SCURRY"");
+  embed->fields->array[S_TOPIC_AFTERMATH].name = format_str(SIZEOF_TITLE, ""GUILD_ICON" Arena Aftermath "GUILD_ICON"");
   embed->fields->array[S_TOPIC_AFTERMATH].value = format_str(SIZEOF_FIELD_VALUE,
       " "OFF_ARROW" Every scurry is dropped from the arena upon running out of war acorns. \n"
-      " "OFF_ARROW" Every time you re-enter the arena (found in scurry info), your courage is reset. \n"
-      " "OFF_ARROW" Scurry ranks provide passive boosts while you're in that rank!");
+      " "OFF_ARROW" Every time you re-enter the arena, your courage is reset. \n"
+      " "OFF_ARROW" Scurries have the option to retreat at any point, but be aware your rank will match your new courage score! \n"
+      " "OFF_ARROW" Scurry ranks provide passive acorn boosts!");
     
-  embed->fields->array[S_TOPIC_RANKS].name = format_str(SIZEOF_TITLE, ""OPPOSING_SCURRY" War Ranks "OPPOSING_SCURRY"");
+  embed->fields->array[S_TOPIC_RANKS].name = format_str(SIZEOF_TITLE, ""GUILD_ICON" War Ranks "GUILD_ICON"");
   embed->fields->array[S_TOPIC_RANKS].value = format_str(SIZEOF_FIELD_VALUE,
-      " "OFF_ARROW" A scurry's *courage* score also determines rank as follows: \n\
-      "INDENT""INDENT" Seed-Nots (*Base*) \n\
-      "INDENT""INDENT" Acorn Snatchers (> **%s** "COURAGE" Courage) \n\
-      "INDENT""INDENT" Seed Sniffers (> **%s** "COURAGE" Courage) \n\
-      "INDENT""INDENT" Oakfficials (> **%s** "COURAGE" Courage) \n\
-      "INDENT""INDENT" Royal Nuts (**%s**+ "COURAGE" Courage)",
+      " "OFF_ARROW" Courage determines scurry rank as follows: \n"
+      INDENT BRONZE_STAHR "Seed-Nots (*Base*) \n"
+      INDENT BRONZE_STAHR "Acorn Snatchers (> **%s** "COURAGE" Courage): x**1.05** \n"
+      INDENT BRONZE_STAHR "Seed Sniffers (> **%s** "COURAGE" Courage) x**1.1** \n"
+      INDENT SILVER_STAHR "Oakfficials (> **%s** "COURAGE" Courage) x**1.15** \n"
+      INDENT STAHR "Royal Nuts (**%s**+ "COURAGE" Courage) x**1.2**",
       num_str(SEED_NOT_MAX), num_str(ACORN_SNATCHER_MAX), num_str(SEED_SNIFFER_MAX), num_str(OAKFFICIAL_MAX) );
 
   embed->footer = discord_set_embed_footer("Happy Foraging!",

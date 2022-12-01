@@ -188,7 +188,7 @@ void power_shop(
   }
 
   embed->thumbnail = (event->data->custom_id) ? discord_set_embed_thumbnail( fill_git_url(enchanted_acorns[rune_type].file_path) )
-      : discord_set_embed_thumbnail( fill_git_url(sq_alchemist->file_path) );
+      : discord_set_embed_thumbnail( fill_git_url(SQ_CHEM_PATH) );
 
   embed->footer = (event->data->custom_id) ? discord_set_embed_footer(
     format_str(SIZEOF_FOOTER_TEXT, "You received the %s!", enchanted_acorns[rune_type].formal_name),

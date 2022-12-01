@@ -68,21 +68,6 @@ enum BIOME {
 
 #define LAST_BIOME (BIOME_SIZE -1)
 
-const struct File *welcome_msg = &(struct File)
-{
-  .file_path = "Squirrel%20Dash%20Utils/welcome_gif.gif",
-};
-
-const struct File *squirrel_bookie = &(struct File)
-{
-  .file_path = "Squirrel%20Dash%20Utils/squirrel_bookie.png",
-};
-
-const struct File *sq_alchemist = &(struct File)
-{
-  .file_path = "Squirrel%20Dash%20Utils/sq_alchemist.png",
-};
-
 /* Items */
 enum ITEMS {
   ITEM_ACORNS,
@@ -357,11 +342,7 @@ const struct Biome *biomes = (struct Biome[])
       .emoji_id = 1007390631016017991
     },
 
-    // TODO:
-    // .biome_scene = "GRASSLANDS%20CONTENT/Utils/grasslands_scene.gif",
-    .biome_scene = {
-      .file_path = "GRASSLANDS%20CONTENT/Utils/grasslands_scene.gif"
-    },
+    .biome_scene_path = "GRASSLANDS%20CONTENT/Utils/grasslands_scene.gif",
 
     .material_ptr = &player.materials.mooshrums,
     .stat_ptr = &player.stats.smell_lv,
@@ -476,9 +457,7 @@ const struct Biome *biomes = (struct Biome[])
       .emoji_id = 1042082262566572153
     },
 
-    .biome_scene = {
-      .file_path = "SEEPING%20SANDS%20CONTENT/Utils/seeping_sands_scene.gif"
-    },
+    .biome_scene_path = "SEEPING%20SANDS%20CONTENT/Utils/seeping_sands_scene.gif",
 
     .material_ptr = &player.materials.cactus_flowers,
     .stat_ptr = &player.stats.dexterity_lv,

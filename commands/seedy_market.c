@@ -134,7 +134,7 @@ void seedy_shop(
         num_str(BASE_SEEDY_PURCHASE * (biome_index +1)));
   }
 
-  embed->thumbnail = discord_set_embed_thumbnail(fill_git_url(squirrel_bookie->file_path) );
+  embed->thumbnail = discord_set_embed_thumbnail(fill_git_url(SQ_BOOKIE_PATH) );
 
   struct File biome_material = biomes[material_type].biome_material;
   embed->footer = (event->data->custom_id) ? discord_set_embed_footer(

@@ -24,8 +24,8 @@ struct Encounter {
 };
 
 struct Biome {
-  struct File biome_scene;
   struct File biome_icon;
+  char* biome_scene_path;
   struct File biome_material;
 
   int* material_ptr;

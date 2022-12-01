@@ -14,6 +14,13 @@
 #define GUILD_ID 905167903224123473
 #define OWNER_ID 582648847881338961
 
+// PATH CONSTANTS
+#define SQ_CHEM_PATH "Squirrel%20Dash%20Utils/sq_alchemist.png"
+#define SQ_BOOKIE_PATH "Squirrel%20Dash%20Utils/squirrel_bookie.png"
+#define WELCOME_MSG_PATH "Squirrel%20Dash%20Utils/welcome_gif.gif"
+#define RULES_BK_PATH "Squirrel%20Dash%20Utils/rules_book.png"
+#define VERIFY_PLUS_PATH "Symbols/plus.png"
+
 // SUPPORT SERVER SPECIFIC IDS
 #define WELCOME_CHANNEL_ID 1046634205729275955
 #define VERIFY_CHANNEL_ID 1046813534790635550
@@ -39,11 +46,11 @@
 // Royal Nut max -> infinity
 
 // WAR ACORN CAPS PER RANK
-#define SEED_NOT_CAP 1000
-#define ACORN_SNATCHER_CAP 2500
-#define SEED_SNIFFER_CAP 5000
-#define OAKFFICIAL_CAP 1000
-#define ROYAL_NUT_CAP 25000
+#define SEED_NOT_CAP 500
+#define ACORN_SNATCHER_CAP 1000
+#define SEED_SNIFFER_CAP 2500
+#define OAKFFICIAL_CAP 5000
+#define ROYAL_NUT_CAP 10000
 
 // Multiply into rank
 #define BASE_COURAGE_MULT 0.05f

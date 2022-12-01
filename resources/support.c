@@ -9,6 +9,7 @@ enum R_TOPIC {
   R_CONTENT,
   R_POLICY,
   R_ADVERTIZING,
+  R_WARN_POLICY,
   R_TOPIC_SIZE
 };
 
@@ -30,7 +31,7 @@ void create_rules(struct discord *client, const struct discord_message *event)
 
   embed->color = (int)strtol("0EDF0A", NULL, 16);
 
-  embed->description = format_str(SIZEOF_DESCRIPTION, "Before we get started, lets lay dowm some rules first. \n");
+  embed->description = format_str(SIZEOF_DESCRIPTION, "Before we get started, let's establish some rules first. \n");
 
   embed->fields = calloc(1, sizeof(struct discord_embed_fields));
   embed->fields->size = R_TOPIC_SIZE;
@@ -38,29 +39,40 @@ void create_rules(struct discord *client, const struct discord_message *event)
 
   embed->fields->array[R_RESPECT].name = format_str(SIZEOF_TITLE, ""ACORNS" Respect "ACORNS"");
   embed->fields->array[R_RESPECT].value = format_str(SIZEOF_FIELD_VALUE,
-      " "OFF_ARROW" Please treat others with respect and be mindful of the things you say. \n\
-      "OFF_ARROW" Hate speech, violent or obscene comments, and otherwise inappropriate or invasive behavior are not tolerated.");
+      "*Please treat others with respect and be mindful of the things you say.* \n\
+      "OFF_ARROW" Hate speech, violent or obscene comments, and otherwise inappropriate or invasive behavior is not tolerated. \n\
+      "OFF_ARROW" For reference, use common sense!");
 
   embed->fields->array[R_CONTENT].name = format_str(SIZEOF_TITLE, ""ACORNS" Content "ACORNS"");
   embed->fields->array[R_CONTENT].value = format_str(SIZEOF_FIELD_VALUE,
-      " "OFF_ARROW" Be mindful of the content posted and be sure the right channels are used. \n\
-      "OFF_ARROW" This means no harmful links and malware, spamming, or adult content (NSFW).");
+      "*Make sure your content is posted in the right channel and **avoid** the following*: \n\
+      "OFF_ARROW" Harmful links or malware. If you don't know the link, don't click it! \n\
+      "OFF_ARROW" Controversial topics such as politcs, religion, etc. (or contributing to) \n\
+      "OFF_ARROW" Spamming pings, messages, etc. \n\
+      "OFF_ARROW" Adult content (NSFW). **If a minor shouldn't see it, then don't post it!**");
 
   embed->fields->array[R_POLICY].name = format_str(SIZEOF_TITLE, ""ACORNS" Bot Policy "ACORNS"");
   embed->fields->array[R_POLICY].value = format_str(SIZEOF_FIELD_VALUE,
       " "OFF_ARROW" There is a license on the bot discussing use of content. Visit the repo and review the license \
-        [here](https://github.com/Furmissile/sqdash/blob/main/LICENCE).");
+        [**here**](https://github.com/Furmissile/sqdash/blob/main/LICENCE). \n\
+      "OFF_ARROW" If you have any questions regarding the license, please reach out Using <#1046634911198629989> or DMing <@!%ld>!.", 
+      OWNER_ID);
 
   embed->fields->array[R_ADVERTIZING].name = format_str(SIZEOF_TITLE, ""ACORNS" Advertising "ACORNS"");
   embed->fields->array[R_ADVERTIZING].value = format_str(SIZEOF_FIELD_VALUE,
       " "OFF_ARROW" All advertising, unless approved of, is prohibited. Please ask before posting!");
 
-  embed->thumbnail = discord_set_embed_thumbnail(fill_git_url(squirrels[GRAY_SQUIRREL].file_path) );
+  embed->fields->array[R_WARN_POLICY].name = format_str(SIZEOF_TITLE, ""ACORNS" Warning Policy "ACORNS"");
+  embed->fields->array[R_WARN_POLICY].value = format_str(SIZEOF_DESCRIPTION,
+      "Moderators (<@&1017203889784750100>) reserve the right to remove a member if they deem it necessary. \n\
+      "OFF_ARROW" In general, a **Warn **(1st)** -> Kick **(2nd)** -> Ban **(3rd)** ** system is in place.");
 
-  embed->image = discord_set_embed_image(fill_git_url(welcome_msg->file_path) );
+  embed->thumbnail = discord_set_embed_thumbnail(fill_git_url(RULES_BK_PATH) );
 
-  embed->footer = discord_set_embed_footer("Happy Foraging!",
-      fill_git_url(items[ITEM_ACORNS].file_path) );
+  embed->image = discord_set_embed_image(fill_git_url(WELCOME_MSG_PATH) );
+
+  embed->footer = discord_set_embed_footer("These rules are subject to change!",
+      fill_git_url(item_types[TYPE_ENCOUNTER].file_path) );
 
   discord_create_message(client, event->channel_id,
   &(struct discord_create_message)
@@ -98,7 +110,7 @@ void welcome_embed(struct discord *client, const struct discord_guild_member *ev
       " "OFF_ARROW" Chat with fellow squirrel advocators in <#1046628380222685255> \n"
       " "OFF_ARROW" Looking for extra help? Ask away in <#1046634911198629989>!");
 
-  embed->image = discord_set_embed_image( fill_git_url(welcome_msg->file_path) );
+  embed->image = discord_set_embed_image( fill_git_url(WELCOME_MSG_PATH) );
 
   embed->footer = discord_set_embed_footer(
     format_str(SIZEOF_FOOTER_TEXT, "Happy foraging!"),
@@ -161,7 +173,7 @@ void create_verify(struct discord *client, const struct discord_message *event)
 
   embed->color = (int)strtol("00ff00", NULL, 16);
 
-  embed->thumbnail = discord_set_embed_thumbnail(fill_git_url(squirrels[GRAY_SQUIRREL].file_path) );
+  embed->thumbnail = discord_set_embed_thumbnail(fill_git_url(VERIFY_PLUS_PATH) );
 
   embed->description = format_str(SIZEOF_DESCRIPTION, "By reacting to this message, you have read and agree to the server rules. \n\
       Please react with the Acorn "ACORNS" emoji to be able to chat. No other emoji will work!");

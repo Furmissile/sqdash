@@ -104,14 +104,20 @@ int scurry_info(
 
   PGresult* rankings = SQL_query("select * from public.player where scurry_id = %ld order by stolen_acorns desc", player.scurry_id);
 
+  int total_score = 0;
   for (int i = 0; i < PQntuples(rankings); i++) 
   {
+    int stolen_acorns = strtoint(PQgetvalue(rankings, i, DB_STOLEN_ACORNS));
     ADD_TO_BUFFER(ranking_pos, SIZEOF_FIELD_VALUE,
         " "INDENT" %s <@!%ld> **%s** \n",
         (i < 3) ? STAHR : (i < 8) ? SILVER_STAHR : BRONZE_STAHR, 
         strtobigint(PQgetvalue(rankings, i, DB_USER_ID)),
-        num_str(strtoint(PQgetvalue(rankings, i, DB_STOLEN_ACORNS))) );
+        num_str(stolen_acorns) );
+    
+    total_score += stolen_acorns;
   }
+
+  ADD_TO_BUFFER(ranking_pos, SIZEOF_FIELD_VALUE, "\nTotal Score: **%s**", num_str(total_score) );
 
   PQclear(rankings);
 
