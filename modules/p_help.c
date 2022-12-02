@@ -55,7 +55,7 @@ void p_help(struct Message *discord_msg)
 
   embed->fields->array[TOPIC_STEAL].name = format_str(SIZEOF_TITLE, ""ACORNS" Stealing Player Acorns "ACORNS"");
   embed->fields->array[TOPIC_STEAL].value = format_str(SIZEOF_FIELD_VALUE,
-      " "OFF_ARROW" Stealing from other players gives acorns and golden acorns. \n"
+      " "OFF_ARROW" Stealing from other players gives acorns and golden acorns "GOLDEN_ACORNS". \n"
       " "OFF_ARROW" Golden acorns can be spent on materials from the **Seedy Market**. Check it out using `/seedy_market`! \n");
   
   embed->footer = discord_set_embed_footer("Happy Foraging!",

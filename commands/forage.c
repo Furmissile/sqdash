@@ -102,7 +102,8 @@ void get_rewards(int item_type, char msg_id)
   }
 
   factor_stats();
-  factor_season(item_type);
+  if (msg_id != TYPE_ENCOUNTER_MSG)
+    factor_season(item_type);
   factor_buff();
 
   // passive buff
