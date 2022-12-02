@@ -54,8 +54,8 @@ void create_rules(struct discord *client, const struct discord_message *event)
   embed->fields->array[R_POLICY].name = format_str(SIZEOF_TITLE, ""ACORNS" Bot Policy "ACORNS"");
   embed->fields->array[R_POLICY].value = format_str(SIZEOF_FIELD_VALUE,
       " "OFF_ARROW" There is a license on the bot discussing use of content. Visit the repo and review the license \
-        [**here**](https://github.com/Furmissile/sqdash/blob/main/LICENCE). \n\
-      "OFF_ARROW" If you have any questions regarding the license, please reach out Using <#1046634911198629989> or DMing <@!%ld>!.", 
+        [**here**](https://github.com/Furmissile/sqdash/blob/main/LICENSE). \n\
+      "OFF_ARROW" If you have any questions regarding the license, please reach out using <#1047233819201261748> or DMing <@!%ld>!.", 
       OWNER_ID);
 
   embed->fields->array[R_ADVERTIZING].name = format_str(SIZEOF_TITLE, ""ACORNS" Advertising "ACORNS"");
@@ -108,7 +108,7 @@ void welcome_embed(struct discord *client, const struct discord_guild_member *ev
       " "OFF_ARROW" Read the <#1046640388456321126> to <#1046813534790635550>! \n"
       " "OFF_ARROW" Begin your adventure in <#1046635264883294259>! \n"
       " "OFF_ARROW" Chat with fellow squirrel advocators in <#1046628380222685255> \n"
-      " "OFF_ARROW" Looking for extra help? Ask away in <#1046634911198629989>!");
+      " "OFF_ARROW" Looking for extra help? Ask away in <#1047233819201261748>!");
 
   embed->image = discord_set_embed_image( fill_git_url(WELCOME_MSG_PATH) );
 
