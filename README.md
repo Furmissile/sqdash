@@ -1,5 +1,5 @@
 <div align="center">
-<img src="https://raw.githubusercontent.com/Furmissile/sqdash/main/Assets/Squirrel%20Dash%20Utils/git_welcome.gif" width="540" alt="Squirrel Dash">
+<img src="https://raw.githubusercontent.com/Furmissile/sqdash/main/Assets/Squirrel%20Dash%20Utils/git_welcome.gif" width="916" alt="Squirrel Dash">
 </div>
 
 # Welcome to Squirrel Dash!
