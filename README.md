@@ -1,4 +1,6 @@
-![banner image](/Assets/Squirrel%20Dash%20Utils/git_welcome.gif?raw=true)
+<div align="center">
+<img src="https://raw.githubusercontent.com/Furmissile/sqdash/main/Assets/Squirrel%20Dash%20Utils/git_welcome.gif" width="250" alt="Squirrel Dash">
+</div>
 
 # Welcome to Squirrel Dash!
 [![Discord](https://img.shields.io/static/v1?label=Discord&message=Support%20Server&color=5865F2)](https://discord.gg/Dd8Te3HmPW)
