@@ -33,23 +33,23 @@ void e_help(struct Message *discord_msg)
   embed->fields->size = E_TOPIC_SIZE;
   embed->fields->array = calloc(E_TOPIC_SIZE, sizeof(struct discord_embed_field));
 
-  embed->fields->array[E_TOPIC_GOLDEN_ACORNS].name = format_str(SIZEOF_TITLE, ""ACORNS" Golden Acorns "ACORNS"");
+  embed->fields->array[E_TOPIC_GOLDEN_ACORNS].name = format_str(SIZEOF_TITLE, ""ACORNS" Golden Acorns");
   embed->fields->array[E_TOPIC_GOLDEN_ACORNS].value = format_str(SIZEOF_FIELD_VALUE,
-      " "OFF_ARROW" Golden acorn "GOLDEN_ACORNS" is also used as an event currency for all event-related purchases. \n");
+      " "OFF_ARROW" The golden acorn "GOLDEN_ACORNS" is also used as an event currency for all event-related purchases. \n");
 
-  embed->fields->array[E_TOPIC_SEASONS].name = format_str(SIZEOF_TITLE, ""ACORNS" Seasons "ACORNS"");
+  embed->fields->array[E_TOPIC_SEASONS].name = format_str(SIZEOF_TITLE, ""ACORNS" Seasons");
   embed->fields->array[E_TOPIC_SEASONS].value = format_str(SIZEOF_DESCRIPTION,
-      " "OFF_ARROW" Seasons weekly change and passively occur. Each season gives a different boost to acorn "ACORNS" gains. \n"
+      " "OFF_ARROW" Seasons weekly change and passively occur. Each season gives a different boost to acorn gains. \n"
       " "OFF_ARROW" Seasons include Spring (+**20**%%), Summer (+**10**%%), Fall (+**5**%%), and Winter (No boost). \n"
       " "OFF_ARROW" Send `/season_info` to find out when the current season ends! \n");
   
-  embed->fields->array[E_TOPIC_SPRING].name = format_str(SIZEOF_TITLE, ""ACORNS" Spring Chicken Event "ACORNS"");
+  embed->fields->array[E_TOPIC_SPRING].name = format_str(SIZEOF_TITLE, ""ACORNS" Spring Chicken Event");
   embed->fields->array[E_TOPIC_SPRING].value = format_str(SIZEOF_DESCRIPTION,
       " "OFF_ARROW" Lasts throughout the in-game Spring season! \n"
       " "OFF_ARROW" Golden acorns have a chance to be included in every `/forage` instead of just from `/steal`! \n"
       " "OFF_ARROW" The amount of golden acorns you receive is proportionate to your acorn rewards.");
 
-  embed->fields->array[E_TOPIC_FUTURE].name = format_str(SIZEOF_TITLE, ""ACORNS" Future Events "ACORNS"");
+  embed->fields->array[E_TOPIC_FUTURE].name = format_str(SIZEOF_TITLE, ""ACORNS" Future Events");
   embed->fields->array[E_TOPIC_FUTURE].value = format_str(SIZEOF_DESCRIPTION,
       " "OFF_ARROW" Future events will be listed here!");
 

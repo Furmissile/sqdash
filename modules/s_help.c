@@ -38,27 +38,27 @@ void s_help(struct Message *discord_msg)
   embed->fields->size = S_TOPIC_SIZE;
   embed->fields->array = calloc(S_TOPIC_SIZE, sizeof(struct discord_embed_field));
 
-  embed->fields->array[S_TOPIC_UTILS].name = format_str(SIZEOF_TITLE, ""GUILD_ICON" Scurry Utils "GUILD_ICON"");
+  embed->fields->array[S_TOPIC_UTILS].name = format_str(SIZEOF_TITLE, ""GUILD_ICON" Scurry Utils");
   embed->fields->array[S_TOPIC_UTILS].value = format_str(SIZEOF_FIELD_VALUE, 
       " "OFF_ARROW" Member invites come in through DM. Press a button to accept or decline. Plan accordingly because invites expire in **2** minutes! \n"
       " "OFF_ARROW" Only the owner "LEADER" can kick a member. Simply follow up `/scurry_kick` with the user mention to kick! \n"
       " "OFF_ARROW" Members can leave on their own prerogative too using `/scurry_leave`. \n"
       "**Please know that your stats related to the scurry will not carry over!**");
   
-  embed->fields->array[S_TOPIC_WARS].name = format_str(SIZEOF_TITLE, ""GUILD_ICON" Scurry Wars "GUILD_ICON"");
+  embed->fields->array[S_TOPIC_WARS].name = format_str(SIZEOF_TITLE, ""GUILD_ICON" Scurry Wars");
   embed->fields->array[S_TOPIC_WARS].value = format_str(SIZEOF_FIELD_VALUE,
       " "OFF_ARROW" Courage "COURAGE" is the main scurry war currency that is obtained from stealing other scurries' war acorns. \n"
       " "OFF_ARROW" Any scurry current in the arena has the chance to steal from your war stash! \n"
       " "OFF_ARROW" To join the arena (found in scurry info), scurries need their war stash "LOST_STASH" full and have at least 5 members present! \n");
   
-  embed->fields->array[S_TOPIC_AFTERMATH].name = format_str(SIZEOF_TITLE, ""GUILD_ICON" Arena Aftermath "GUILD_ICON"");
+  embed->fields->array[S_TOPIC_AFTERMATH].name = format_str(SIZEOF_TITLE, ""GUILD_ICON" Arena Aftermath");
   embed->fields->array[S_TOPIC_AFTERMATH].value = format_str(SIZEOF_FIELD_VALUE,
       " "OFF_ARROW" Every scurry is dropped from the arena upon running out of war acorns. \n"
       " "OFF_ARROW" Every time you re-enter the arena, your courage is reset. \n"
       " "OFF_ARROW" Scurries have the option to retreat at any point, but be aware your rank will match your new courage score! \n"
       " "OFF_ARROW" Scurry ranks provide passive acorn boosts!");
     
-  embed->fields->array[S_TOPIC_RANKS].name = format_str(SIZEOF_TITLE, ""GUILD_ICON" War Ranks "GUILD_ICON"");
+  embed->fields->array[S_TOPIC_RANKS].name = format_str(SIZEOF_TITLE, ""GUILD_ICON" War Ranks");
   embed->fields->array[S_TOPIC_RANKS].value = format_str(SIZEOF_FIELD_VALUE,
       " "OFF_ARROW" Courage determines scurry rank as follows: \n"
       INDENT BRONZE_STAHR "Seed-Nots (*Base*) \n"
