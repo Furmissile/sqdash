@@ -28,4 +28,4 @@ This bot was made using the following libraries:
 Much appreciation to the [Cogmasters](https://discord.gg/Q6GcH6r5Gt) team who answered my countless questions about not only how to use Concord, but also managed to teach me C and so much about databases!
 
 ## License
-This project has a custom [license](https://github.com/Furmissile/sqdash/blob/main/LICENCE). Please check it out!
+This project has a custom [license](https://github.com/Furmissile/sqdash/blob/main/LICENSE). Please check it out!
