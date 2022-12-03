@@ -61,7 +61,8 @@ void p_help(struct Message *discord_msg)
 
   embed->fields->array[TOPIC_HELP].name = format_str(SIZEOF_TITLE, ""ACORNS" Reporting Issues");
   embed->fields->array[TOPIC_HELP].value = format_str(SIZEOF_FIELD_VALUE, 
-      " "OFF_ARROW" If you've found a bug or just have a question that wasn't addressed, feel free to join the [support server](https://discord.gg/Dd8Te3HmPW)!");
+      " "OFF_ARROW" If you've found a bug or just have a question that wasn't addressed, feel free to join the [support server](https://discord.gg/Dd8Te3HmPW)! \n"
+      " "OFF_ARROW" Want to support Squirrel Dash? Give her a star on [Github](https://github.com/Furmissile/sqdash)!");
   
   embed->footer = discord_set_embed_footer("Happy Foraging!",
       fill_git_url(items[ITEM_ACORNS].file_path) );

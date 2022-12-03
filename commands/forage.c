@@ -102,7 +102,9 @@ void get_rewards(int item_type, char msg_id)
   }
 
   factor_stats();
-  if (msg_id != TYPE_ENCOUNTER_MSG)
+  if (item_type != TYPE_NO_ACORNS)
+    printf("This is not TYPE NO ACORNS \n");
+  if (item_type != TYPE_NO_ACORNS)
     factor_season(item_type);
   factor_buff();
 

@@ -39,7 +39,7 @@ void steal_acorns(struct Message *discord_msg)
     embed->title = format_str(SIZEOF_TITLE, "Steal Failed!");
     discord_msg->content = format_str(SIZEOF_DESCRIPTION, "<@!%ld>, someone failed to snatch your acorns!", t_player_id);
     embed->description = format_str(SIZEOF_DESCRIPTION, 
-        "<@!%ld> failed to steal **%d** acorns! \n\n-**10** "ENERGY" Energy", 
+        "<@!%ld> failed to steal **%d** acorns! \n\n-**20** "ENERGY" Energy", 
         player.user_id, stolen_acorns);
   }
   else {
