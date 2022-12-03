@@ -363,7 +363,7 @@ const struct Biome *biomes = (struct Biome[])
         .conflict = "Rats! They surely don't like you. Who knows what they could be carrying...",
         .file_path = "GRASSLANDS%20CONTENT/Encounters/city_rat.png",
 
-        .solution = {"Give them a peace offering", "Hug him", "Back off"}
+        .solution = {"Give him a peace offering", "Hug him", "Back off"}
       },
       {
         .name = "Witch Swamp: Is it an Acorn?",
@@ -377,7 +377,7 @@ const struct Biome *biomes = (struct Biome[])
         .conflict = "These coyotes keep inching towards you. They're curious but do you want to take that chance?",
         .file_path = "GRASSLANDS%20CONTENT/Encounters/coyote.png",
 
-        .solution = {"Take your chances", "Punch him in the snoot and run up a tree", "Shriek to scare them off"}
+        .solution = {"Take your chances", "Punch him in the snoot and run up a tree", "Shriek to scare him off"}
       },
       {
         .name = "Desolate Plains: Bullseye",
@@ -412,7 +412,7 @@ const struct Biome *biomes = (struct Biome[])
         .conflict = "It's a friendly squirrel! Is it?",
         .file_path = "GRASSLANDS%20CONTENT/Encounters/squirrel_doppleganger.png",
 
-        .solution = {"Shake his paw", "Indicate you know it's a disguise", "Ignore them"}
+        .solution = {"Shake his paw", "Indicate you know it's a disguise", "Ignore him"}
       },
       {
         .name = "Witch Swamp: Poison from Below! Above?",
@@ -506,7 +506,7 @@ const struct Biome *biomes = (struct Biome[])
         .conflict = "A pack of hyenas are giving you the death stare...",
         .file_path = "SEEPING%20SANDS%20CONTENT/Encounters/hyena.png",
 
-        .solution = {"Try to cuddle with them", "Aim for the throat!", "Run to a nearby carcass"}
+        .solution = {"Try to touch one", "Aim for the throat!", "Run to a nearby carcass"}
       },
       {
         .name = "Golden Dunes: The Curious Jackal",
@@ -548,7 +548,7 @@ const struct Biome *biomes = (struct Biome[])
         .conflict = "What looks to be a skeletal squirrel makes eye contaact with you... Well? You can't just ignore it!",
         .file_path = "SEEPING%20SANDS%20CONTENT/Encounters/skeletal_squirrel.png",
 
-        .solution = {"Shake its paw", "Tame him", "Offer an acorn"}
+        .solution = {"Shake its paw", "Tame it", "Offer an acorn"}
       },
       {
         .name = "Golden Dunes: Desert Puppers",
