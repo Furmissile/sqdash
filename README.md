@@ -27,11 +27,5 @@ This bot was made using the following libraries:
 
 Much appreciation to the [Cogmasters](https://discord.gg/Q6GcH6r5Gt) team who answered my countless questions about not only how to use Concord, but also managed to teach me C and so much about databases!
 
-## Disclaimer on Open Source
-This project is not designed to be edited or forked by other users. That being said, there are a few crucial files that are missing from this project such as a `main.c`, how the project gets compiled, and the utilities used for the support server. The only code that is maintained and posted are the mechanics relevant to the player as pertains to the license. Here you will find how all the features work, how the scales work, and even be able to locate outlines on how the mechanic is intended to work.
-
-All questions, comments, and concerns should be brought to the support server so that they may be more adequately addressed.
-
-
 ## License
 This project has a custom [license](https://github.com/Furmissile/sqdash/blob/main/LICENSE). Please check it out!
