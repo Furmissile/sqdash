@@ -10,7 +10,8 @@
     snprintf(buffer + strlen(buffer), size - strlen(buffer), format, ##__VA_ARGS__)
 
 /* @@@ SERVER CONSTANTS @@@ */
-#define APPLICATION_ID 905163158149287936
+// #define APPLICATION_ID 905163158149287936 // main bot
+#define APPLICATION_ID 1048439491607674930 // beta bot
 #define GUILD_ID 905167903224123473
 #define OWNER_ID 582648847881338961
 

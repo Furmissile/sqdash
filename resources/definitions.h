@@ -76,6 +76,7 @@ enum ITEMS {
   ITEM_PINE_CONES,
   ITEM_SEEDS,
   ITEM_XP,
+  ITEM_STAHR,
   ITEM_SIZE
 };
 
@@ -86,7 +87,7 @@ const struct File *items = (struct File[])
     .formal_name = "Acorns",
     .file_path = "Items/acorn.png",
 
-    .emoji_name = "acorn",
+    .emoji_name = "acorns",
     .emoji_id = 1045028765392187402
   },
   {
@@ -123,6 +124,12 @@ const struct File *items = (struct File[])
 
     .emoji_name = "xp",
     .emoji_id = 1001511753294815424
+  },
+  {
+    .formal_name = "Level",
+
+    .emoji_name = "stahr",
+    .emoji_id = 1045705606134251601
   }
 
 };
