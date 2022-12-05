@@ -112,7 +112,9 @@ int generate_price(int stat_lv, int unit_price, float mult_factor)
 
 int factor_biome(int player_lv)
 {
-  return (player_lv < 20) ? 0 : ((player_lv -20)/10 +1);
+  int player_biome = (player_lv -20)/10;
+
+  return (player_lv < 20) ? 0 : (player_biome >= BIOME_SIZE -1) ? BIOME_SIZE -1 : player_biome;
 }
 
 void check_level(struct Message *discord_msg)
@@ -230,10 +232,10 @@ char* trim_user_id(char input[])
 {
   char* user_id = calloc(32, sizeof(char));
 
-  int user_id_i = 3;
+  int user_id_i = 2;
   while (input[user_id_i] != '>') 
   {
-    user_id[user_id_i -3] = input[user_id_i];
+    user_id[user_id_i -2] = input[user_id_i];
     user_id_i++;
   }
 
