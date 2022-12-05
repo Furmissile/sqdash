@@ -27,7 +27,8 @@ struct discord_components* build_biome_buttons(
     emoji->id = biome_icon.emoji_id;
 
     char* set_custom_id = calloc(SIZEOF_CUSTOM_ID, sizeof(char));
-    snprintf(set_custom_id, SIZEOF_CUSTOM_ID, "%c%d_%ld", TYPE_BIOME, i, event->member->user->id);
+    snprintf(set_custom_id, SIZEOF_CUSTOM_ID, "%c%d_%ld", TYPE_BIOME, i, player.user_id);
+    // if player selected anther user, they wont be able to swap their biome
 
     buttons->array[i] = (struct discord_component)
     {
@@ -179,15 +180,24 @@ int info_interaction(
   const struct discord_interaction *event, 
   struct Message *msg) 
 {
-  player = load_player_struct(event->member->user->id);
+  struct discord_guild_member target_member = { 0 };
+  struct discord_ret_guild_member ret_member = { .sync = &target_member };
+
+  if (event->data->options && event->data->options->array[0].value)
+    discord_get_guild_member(client, GUILD_ID, strtobigint(trim_user_id(event->data->options->array[0].value)), &ret_member);
+  else
+    discord_get_guild_member(client, GUILD_ID, event->member->user->id, &ret_member);
+
+  player = load_player_struct(target_member.user->id);
+
   scurry = load_scurry_struct(player.scurry_id);
 
   energy_regen();
   //Load Author
   msg->embed->author = discord_set_embed_author(
-    format_str(SIZEOF_TITLE, event->member->user->username),
+    format_str(SIZEOF_TITLE, target_member.user->username),
     format_str(SIZEOF_URL, "https://cdn.discordapp.com/avatars/%lu/%s.png", 
-        event->member->user->id, event->member->user->avatar) );
+        target_member.user->id, target_member.user->avatar) );
 
   player_info(event, msg);
 
@@ -221,7 +231,7 @@ int info_interaction(
   free(msg->buttons);
   free(msg);
 
-  update_player_row(event->member->user->id, player);
+  update_player_row(player.user_id, player);
   // scurry doesnt need to be updated!
   scurry = (struct Scurry) { 0 };
 
