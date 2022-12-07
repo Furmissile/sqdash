@@ -186,6 +186,8 @@ XP_MULTIPLIER
 #define FALL_MULT 1.05f
 #define WINTER_MULT 1 // Explicit for definition
 
+#define ERROR_STATUS -1
+
 #define MATCH_USER_ID(user_id, message) \
     if (!strstr(event->data->custom_id, user_id)) { \
     error_message(client, event, message); \
@@ -196,7 +198,7 @@ XP_MULTIPLIER
 #define ERROR_INTERACTION(error, message) \
     if (error) { \
       error_message(client, event, message); \
-      return 1; \
+      return ERROR_STATUS; \
     }
 
 #define SIZEOF_SQL_COMMAND 1024
@@ -206,7 +208,7 @@ XP_MULTIPLIER
     if (error) { \
       error_message(client, event, message); \
       PQclear(PQ_result); \
-      return 1; \
+      return ERROR_STATUS; \
     }
 
 /* @@@ SOME EMOJI CONSTANTS @@@ */
