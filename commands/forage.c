@@ -115,6 +115,7 @@ void get_rewards(int item_type, char msg_id)
   player.acorns += rewards.acorns;
   player.materials.seeds += rewards.seeds;
   player.materials.pine_cones += rewards.pine_cones;
+  player.golden_acorns += rewards.golden_acorns;
   *biomes[player.biome].material_ptr += rewards.biome_material;
 }
 
