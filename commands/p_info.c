@@ -173,31 +173,26 @@ void player_info(
   discord_msg->buttons = build_biome_buttons(event, player.max_biome +1);
 }
 
-
 /* Listens for slash command interactions */
 int info_interaction(
   struct discord *client, 
   const struct discord_interaction *event, 
   struct Message *msg) 
 {
-  struct discord_guild_member target_member = { 0 };
-  struct discord_ret_guild_member ret_member = { .sync = &target_member };
+  struct discord_user target_user = { 0 };
 
-  if (event->data->options && event->data->options->array[0].value)
-    discord_get_guild_member(client, GUILD_ID, strtobigint(trim_user_id(event->data->options->array[0].value)), &ret_member);
-  else
-    discord_get_guild_member(client, GUILD_ID, event->member->user->id, &ret_member);
+  if (retrieve_discord_user(client, event, &target_user) == ERROR_STATUS)
+    return 1;
 
-  player = load_player_struct(target_member.user->id);
-
+  player = load_player_struct(target_user.id);
   scurry = load_scurry_struct(player.scurry_id);
 
   energy_regen();
   //Load Author
   msg->embed->author = discord_set_embed_author(
-    format_str(SIZEOF_TITLE, target_member.user->username),
+    format_str(SIZEOF_TITLE, target_user.username),
     format_str(SIZEOF_URL, "https://cdn.discordapp.com/avatars/%lu/%s.png", 
-        target_member.user->id, target_member.user->avatar) );
+        target_user.id, target_user.avatar) );
 
   player_info(event, msg);
 
@@ -231,7 +226,8 @@ int info_interaction(
   free(msg->buttons);
   free(msg);
 
-  update_player_row(player.user_id, player);
+  if (event->data->custom_id)
+    update_player_row(player.user_id, player);
   // scurry doesnt need to be updated!
   scurry = (struct Scurry) { 0 };
 
