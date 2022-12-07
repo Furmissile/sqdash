@@ -151,33 +151,54 @@ void error_message(struct discord *client, const struct discord_interaction *eve
   discord_create_interaction_response(client, event->id, event->token, &error_message, NULL);
 }
 
+unsigned long strtobigint(const char* str)
+{
+  if (!str)
+    return -1;
+
+  for (size_t i = 0; i < strlen(str); i++)
+    if (str[i] -48 < 0
+      || str[i] -48 > 9)
+      return -1;
+
+  return strtol(str, NULL, 10);
+}
+
+
+char* trim_user_id(char* input)
+{
+  char* user_id = calloc(32, sizeof(char));
+
+  char tmp_buffer[32] = {};
+  if (!strstr(input, "<@") && input[strlen(input) -1] != '>')
+    snprintf(tmp_buffer, sizeof(tmp_buffer), "<@%s>", input);
+  else if (!strstr(input, "<@") || input[strlen(input) -1] != '>')
+    return NULL;
+  else 
+    snprintf(tmp_buffer, sizeof(tmp_buffer), "%s", input);
+
+  int user_id_i = 2;
+  while (tmp_buffer[user_id_i] != '>' && tmp_buffer[user_id_i])
+  {
+    user_id[user_id_i -2] = tmp_buffer[user_id_i];
+    user_id_i++;
+  }
+
+  return user_id;
+}
+
 int strtoint(const char* str)
 {
   int num = 0;
+  size_t max_len = strlen(str);
 
-  for (size_t i = 1; i < strlen(str) +1; i++)
+  for (size_t i = 1; i < max_len +1; i++)
   {
     int base_multiplier = 1;
     for (size_t x = 1; x < i; x++)
       base_multiplier *= 10;
 
-    num += (str[strlen(str) - i] - 48) * base_multiplier;
-  }
-
-  return num;
-}
-
-unsigned long strtobigint(const char* str)
-{
-  unsigned long num = 0;
-
-  for (size_t i = 1; i < strlen(str) +1; i++)
-  {
-    unsigned long base_multiplier = 1;
-    for (size_t x = 1; x < i; x++)
-      base_multiplier *= 10;
-
-    num += (str[strlen(str) - i] - 48) * base_multiplier;
+    num += (str[max_len - i] - 48) * base_multiplier;
   }
 
   return num;
@@ -227,19 +248,23 @@ char* lowercase(const char* str)
   return buffer;
 }
 
-
-char* trim_user_id(char input[])
+int retrieve_discord_user(struct discord *client, const struct discord_interaction *event, struct discord_user *target_user)
 {
-  char* user_id = calloc(32, sizeof(char));
+  struct discord_ret_user ret_user = { .sync = target_user };
 
-  int user_id_i = 2;
-  while (input[user_id_i] != '>') 
-  {
-    user_id[user_id_i -2] = input[user_id_i];
-    user_id_i++;
-  }
+  unsigned long target_id = (event->data->options) ? strtobigint(trim_user_id(event->data->options->array[0].value))
+    : event->member->user->id;
 
-  return user_id;
+  printf("%ld \n", target_id);
+  ERROR_INTERACTION(
+    (target_id == (unsigned long)ERROR_STATUS || discord_get_user(client, target_id, &ret_user) != CCORD_OK), 
+    "This is an invalid user!" );
+  
+  PGresult* locate_player = SQL_query("select user_id from public.player where user_id = %ld", target_id);
+  ERROR_DATABASE_RET((PQntuples(locate_player) == 0), "This player cannot be found!", locate_player);
+  PQclear(locate_player);
+
+  return 0;
 }
 
 void energy_status(struct Message *discord_msg)
