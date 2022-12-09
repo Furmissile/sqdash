@@ -2,68 +2,73 @@
 
   This file handles acorn stealing
   - A random player is selected from the query
-  - Players gain acorns and the victim loses acorns based on their level
-  - If the player has more acorns than needed ? subtract acorns and add golden acorns : set to 0
+  - Players literally steal from other players but chance is based on the difference of level
+  - if the difference in player level > 0 ? 1 : abs(difference)
+  - No need to set acorns to 0 if less than since the amount stolen is a percent of their acorns
   - If the steal failed, the player is notified, otherwise the steal is anonymous!
-  - There should be a 50% chance to successfully steal another player's acorns
 
 */
 
+
+// Instead of enumerating, create a struct to allocate
 enum TARGET_USER {
   TARGET_USER_ID,
   TARGET_USER_LEVEL,
   TARGET_USER_ACORNS
 };
 
-#define COMMON_STEAL_CHANCE 65
-#define RARE_STEAL_CHANCE 90
-
 void steal_acorns(struct Message *discord_msg)
 {
   struct discord_embed *embed = discord_msg->embed;
 
+  // select all players that isnt player or isnt in same scurry
   PGresult* t_user = (player.scurry_id > 0) ?
-      SQL_query("select user_id, p_level, acorns from public.player where user_id != %ld and scurry_id != %ld", 
-      player.user_id, player.scurry_id)
-      : SQL_query("select user_id, p_level, acorns from public.player where user_id != %ld", 
-      player.user_id);
+      SQL_query("select user_id, p_level, acorns from public.player where user_id != %ld and user_id != %ld and scurry_id != %ld order by random() LIMIT 1", 
+      player.user_id, OWNER_ID, player.scurry_id)
+      : SQL_query("select user_id, p_level, acorns from public.player where user_id != %ld and user_id != %ld order by random() LIMIT 1", 
+      player.user_id, OWNER_ID);
+  
+  unsigned long t_user_id = strtobigint( PQgetvalue(t_user, 0, TARGET_USER_ID));
+  int t_acorns = strtoint( PQgetvalue(t_user, 0, TARGET_USER_ACORNS) );
 
-  int selected_player = genrand(0, PQntuples(t_user) -1);
-  int base_value = genrand(50, MAX_CHANCE);
-  int stolen_acorns = ( strtoint( PQgetvalue(t_user, selected_player, TARGET_USER_LEVEL) ) ) * base_value;
-  unsigned long t_player_id = strtobigint(PQgetvalue(t_user, selected_player, TARGET_USER_ID));
+  // difference in level
+  int delta_lv = player.level - strtoint( PQgetvalue(t_user, 0, TARGET_USER_LEVEL) );
 
-  if (rand() % MAX_CHANCE < 50)
+  // what gets put into formula
+  int offset = (delta_lv >= 0) ? 3 : abs(delta_lv);
+
+  float chance = 1.0/(offset +1.0);
+
+  int stolen_acorns = t_acorns * chance;
+
+  if (rand() % MAX_CHANCE > chance *100)
   {
     embed->color = (int)ACTION_FAILED;
     embed->title = format_str(SIZEOF_TITLE, "Steal Failed!");
-    discord_msg->content = format_str(SIZEOF_DESCRIPTION, "<@!%ld>, someone failed to snatch your acorns!", t_player_id);
+    discord_msg->content = format_str(SIZEOF_DESCRIPTION, "<@!%ld>, someone failed to snatch your acorns!", t_user_id);
     embed->description = format_str(SIZEOF_DESCRIPTION, 
-        "<@!%ld> failed to steal **%d** acorns! \n\n-**20** "ENERGY" Energy", 
-        player.user_id, stolen_acorns);
+        "<@!%ld> failed to steal **%s** "ACORNS" acorns! \n\n-**20** "ENERGY" Energy", 
+        player.user_id, num_str(stolen_acorns));
   }
   else {
-    int t_user_acorns = strtoint(PQgetvalue(t_user, selected_player, TARGET_USER_ACORNS));
-    if (t_user_acorns - stolen_acorns < 0)
-      SQL_query("update public.player set acorns = 0 where user_id = %ld", t_player_id);
-    else
-      SQL_query("update public.player set acorns = %d where user_id = %ld", 
-          t_user_acorns - stolen_acorns, t_player_id);
+    SQL_query("update public.player set acorns = %d where user_id = %ld", 
+        t_acorns - stolen_acorns, t_user_id);
     
-    int golden_acorns = (base_value < COMMON_STEAL_CHANCE + 50) ? genrand(15, 10)
-        : (base_value < RARE_STEAL_CHANCE + 50) ? genrand(25, 25) 
-        : genrand(50, 25);
+    int golden_acorns = (chance *100 < 25) ? genrand(25, 15)
+        : (chance *100 < 90) ? genrand(50, 25) 
+        : genrand(75, 25);
 
     player.acorns += stolen_acorns;
+    player.passive_acorns += stolen_acorns;
     player.golden_acorns += golden_acorns;
 
     embed->color = (int)ACTION_SUCCESS;
     embed->title = format_str(SIZEOF_TITLE, "Steal Successful!");
     embed->description = format_str(SIZEOF_DESCRIPTION,
-        "You anonymously stole **%d** acorns! \n"
+        "You anonymously stole **%s** "ACORNS" acorns! \n"
         "+**%d** "GOLDEN_ACORNS" Golden Acorns \n"
         "\n-**%d** "ENERGY" Energy",
-        stolen_acorns, golden_acorns, STEAL_ENERGY_COST);
+        num_str(stolen_acorns), golden_acorns, STEAL_ENERGY_COST);
   }
   
   if (player.user_id != OWNER_ID)
