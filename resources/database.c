@@ -2,7 +2,6 @@
 
   This file handles database interactions.
 
-
 */
 
 PGconn* establish_connection(char* conninfo)
@@ -62,6 +61,7 @@ struct Player load_player_struct(unsigned long user_id)
     .golden_acorns = strtoint( PQgetvalue(search_player, 0, DB_GOLDEN_ACORNS) ),
     .scurry_id = strtobigint(PQgetvalue(search_player, 0, DB_SCURRY_ID) ),
     .stolen_acorns = strtoint( PQgetvalue(search_player, 0, DB_STOLEN_ACORNS) ),
+    .passive_acorns = strtoint( PQgetvalue(search_player, 0, DB_PASSIVE_ACORNS) ),
 
     .materials = {
       .pine_cones = strtoint( PQgetvalue(search_player, 0, DB_PINE_CONES) ),
@@ -169,11 +169,12 @@ void update_player_row(unsigned long user_id, struct Player player_res)
       energy = %d, \
       golden_acorns = %d, \
       scurry_id = %ld, \
-      stolen_acorns = %d \
+      stolen_acorns = %d, \
+      passive_acorns = %d \
     where user_id = %ld;",
       player_res.level, player_res.xp, player_res.acorns, player_res.biome, player_res.select_encounter,
       player_res.color, player_res.main_cd, player_res.energy, player_res.golden_acorns, player_res.scurry_id,
-      player_res.stolen_acorns, user_id);
+      player_res.stolen_acorns,player_res.passive_acorns, user_id);
   
   ADD_TO_BUFFER(sql_str, SIZEOF_SQL_COMMAND,
     "update public.materials set \

@@ -18,8 +18,9 @@ enum DB_TUPLE {
   DB_GOLDEN_ACORNS,
   DB_SCURRY_ID,
   DB_STOLEN_ACORNS,
+  DB_PASSIVE_ACORNS,
 
-  DB_SEEDS = 14,
+  DB_SEEDS = 15,
   DB_PINE_CONES,
   DB_MOOSHRUMS,
   DB_CACTUS_FLOWERS,
@@ -27,13 +28,13 @@ enum DB_TUPLE {
   DB_BLUEBERRIES,
   DB_DARK_CHESTNUTS,
 
-  DB_SMELL_LV = 22,
+  DB_SMELL_LV = 23,
   DB_DEXTERITY_LV,
   DB_ACUITY_LV,
   DB_LUCK_LV,
   DB_PROFICIENCY_LV,
 
-  DB_SMELL_ACORN = 28,
+  DB_SMELL_ACORN = 29,
   DB_ENDURANCE_ACORN,
   DB_ACUITY_ACORN,
   DB_LUCK_ACORN,
@@ -77,6 +78,7 @@ enum ITEMS {
   ITEM_SEEDS,
   ITEM_XP,
   ITEM_STAHR,
+  ITEM_PASSIVE_ACORN,
   ITEM_SIZE
 };
 
@@ -130,6 +132,13 @@ const struct File *items = (struct File[])
 
     .emoji_name = "stahr",
     .emoji_id = 1045705606134251601
+  },
+  {
+    .formal_name = "Passive Acorns",
+    .emoji_name = "passive_acorns",
+
+    .emoji_id = 1050407923823677502
+    // .file_path = "Items/passive_acorns.png"
   }
 
 };
