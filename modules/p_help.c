@@ -41,7 +41,8 @@ void p_help(struct Message *discord_msg)
   embed->fields->array[TOPIC_MATERIALS].name = format_str(SIZEOF_TITLE, ""ACORNS" Materials vs Biome Materials");
   embed->fields->array[TOPIC_MATERIALS].value = format_str(SIZEOF_FIELD_VALUE,
       " "OFF_ARROW" Seeds "SEEDS" and pine cones "PINE_CONES" can be found *anywhere* whereas biome materials are biome-specific. \n"
-      " "OFF_ARROW" Seeds are used for enchanted acorns and pine cones are used for stat upgrades. \n"
+      " "OFF_ARROW" Seeds are used for enchanted acorns or `/buffs` and pine cones are used for stat upgrades or `/upgrades`. \n"
+      " "OFF_ARROW" The funtionality of stores is mention on the embed itself. \n"
       " "OFF_ARROW" Biome materials are used for various purchases.");
 
   embed->fields->array[TOPIC_PROGRESSION].name = format_str(SIZEOF_TITLE, ""ACORNS" Biome Progression");
