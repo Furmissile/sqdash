@@ -4,14 +4,24 @@
 
 */
 
+// switch beta on and off
+#define BETA
+
+#ifdef BETA
+  #undef BETA
+  #define BETA "beta_"
+  #define APPLICATION_ID 1048439491607674930
+#else
+  #define BETA
+  #define APPLICATION_ID 905163158149287936
+#endif
+
 #define genrand(base, range) ( (rand() % (range +1)) + base ) // range +1 since rand is [base, range)
 
 #define ADD_TO_BUFFER(buffer, size, format, ...) \
     snprintf(buffer + strlen(buffer), size - strlen(buffer), format, ##__VA_ARGS__)
 
 /* @@@ SERVER CONSTANTS @@@ */
-// #define APPLICATION_ID 905163158149287936 // main bot
-#define APPLICATION_ID 1048439491607674930 // beta bot
 #define GUILD_ID 905167903224123473
 #define OWNER_ID 582648847881338961
 
@@ -24,6 +34,7 @@
 
 // SUPPORT SERVER SPECIFIC IDS
 #define WELCOME_CHANNEL_ID 1046634205729275955
+// #define MAIN_CHANNEL_ID 1046635264883294259 //to be used as system messages
 #define VERIFY_CHANNEL_ID 1046813534790635550
 #define MEMBER_ROLE_ID 1046627142345170984
 
@@ -37,7 +48,7 @@
 #define SCURRY_MEMBER_MAX 15
 #define SCURRY_MEMBER_REQ 5 // requirement to participate in wars
 
-#define SCURRY_CREATION_COST 100000 //100,000
+#define SCURRY_CREATION_COST 50000 //50,000
 
 // RANK REQUIREMENTS
 #define SEED_NOT_MAX 5000
@@ -114,7 +125,7 @@
 #define UNIT_BIOME_MATERIAL 1
 
 //Fixed enchanted acorn costs
-#define ACORN_BUFF_COST 5000
+#define ACORN_BUFF_COST 2500
 #define SEEDS_BUFF_COST 25
 #define BIOME_MATERIAL_BUFF_COST 5
 
@@ -190,8 +201,8 @@ XP_MULTIPLIER
 
 #define MATCH_USER_ID(user_id, message) \
     if (!strstr(event->data->custom_id, user_id)) { \
-    error_message(client, event, message); \
-    return; \
+      error_message(client, event, message); \
+      return; \
     }
 
 // Game errors
@@ -218,7 +229,9 @@ XP_MULTIPLIER
 
 #define XP "<:xp:1001511753294815424>"
 #define ACORNS "<:acorns:1045028765392187402>"
+
 #define GOLDEN_ACORNS "<:golden_acorn:1045032005420728430>"
+#define CATNIP "<:catnip:1052250368039452732>"
 
 #define LOST_STASH "<:lost_stash:1044620525944705146>"
 
@@ -226,6 +239,7 @@ XP_MULTIPLIER
 #define PINE_CONES "<:pine_cones:1044620708996722708>"
 
 #define QUEST_MARKER "<:quest_marker:1046493067500335104>"
+#define HELP_MARKER "<:no_acorns:1044620527223975957>"
 
 #define BRONZE_STAHR "<:bronze_stahr:1010662617217511434>"
 #define SILVER_STAHR "<:silver_stahr:1010662591615475835>"
@@ -238,3 +252,5 @@ XP_MULTIPLIER
 #define OPPOSING_SCURRY "<:opposing_scurry:1037000813291241524>"
 #define LEADER "<:leader:1035976066965196861>"
 #define COURAGE "<:courage:1045555306832347147>"
+
+#define PASSIVE_ACORNS "<:passive_acorns:1050407923823677502>"
