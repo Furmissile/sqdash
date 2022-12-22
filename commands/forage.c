@@ -63,20 +63,20 @@ void get_rewards(int item_type, char msg_id)
   switch (item_type) {
     case TYPE_ACORN_HANDFUL:
       rewards = (struct Rewards) {
-        .xp = genrand(25, 25), 
-        .acorns = genrand(15, 5)
-      };
-      break;
-    case TYPE_ACORN_MOUTHFUL:
-      rewards = (struct Rewards) {
         .xp = genrand(50, 25), 
         .acorns = genrand(25, 15)
       };
       break;
-    case TYPE_LOST_STASH:
+    case TYPE_ACORN_MOUTHFUL:
       rewards = (struct Rewards) {
         .xp = genrand(75, 25), 
-        .acorns = genrand(50, 25), 
+        .acorns = genrand(50, 25)
+      };
+      break;
+    case TYPE_LOST_STASH:
+      rewards = (struct Rewards) {
+        .xp = genrand(100, 50), 
+        .acorns = genrand(75, 25), 
         .seeds = genrand(1, 3),
         .pine_cones = genrand(1, 3),
         .biome_material = (rand() % MAX_CHANCE < MAX_MATERIAL_CHANCE - (player.biome * 10) ) ? 1 : 0
@@ -84,10 +84,12 @@ void get_rewards(int item_type, char msg_id)
       break;
     case TYPE_ACORN_SACK:
       rewards = (struct Rewards) {
-        .xp = genrand(100, 50), 
-        .acorns = genrand(75, 25)
+        .xp = genrand(150, 50), 
+        .acorns = genrand(100, 25)
       };
   }
+
+  player.acorn_count += rewards.acorns;
 
   if (scurry.war_flag == 1 && (rand() % MAX_CHANCE) > 65)
     factor_war(item_type);
@@ -101,11 +103,13 @@ void get_rewards(int item_type, char msg_id)
     rewards.acorns *= 2;
   }
 
+  rewards.acorns *= 1 + (0.2 * (player.level/20));
+
   factor_stats();
-  if (item_type != TYPE_NO_ACORNS)
-    printf("This is not TYPE NO ACORNS \n");
+
   if (item_type != TYPE_NO_ACORNS)
     factor_season(item_type);
+
   factor_buff();
 
   // passive buff
@@ -116,6 +120,7 @@ void get_rewards(int item_type, char msg_id)
   player.materials.seeds += rewards.seeds;
   player.materials.pine_cones += rewards.pine_cones;
   player.golden_acorns += rewards.golden_acorns;
+  player.catnip += rewards.catnip;
   *biomes[player.biome].material_ptr += rewards.biome_material;
 }
 
@@ -136,24 +141,24 @@ void generate_rewards(
   switch (item_type) {
     case TYPE_ACORN_HANDFUL: case TYPE_ACORN_MOUTHFUL: case TYPE_ACORN_SACK:
       ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION,
-          "+**%d** "XP" XP \n"
-          "+**%d** "ACORNS" Acorns \n", 
-          rewards.xp,rewards.acorns);
+          "+**%s** "XP" XP \n"
+          "+**%s** "ACORNS" Acorns \n", 
+          num_str(rewards.xp), num_str(rewards.acorns) );
       break;
     case TYPE_LOST_STASH:
       ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION,
-          "+**%d** "XP" XP \n"
-          "+**%d** "ACORNS" Acorns \n"
-          "+**%d** "SEEDS" Seeds \n"
-          "+**%d** "PINE_CONES" Pine Cones \n",
-          rewards.xp, rewards.acorns, rewards.seeds, rewards.pine_cones);
+          "+**%s** "XP" XP \n"
+          "+**%s** "ACORNS" Acorns \n"
+          "+**%s** "SEEDS" Seeds \n"
+          "+**%s** "PINE_CONES" Pine Cones \n",
+          num_str(rewards.xp), num_str(rewards.acorns), num_str(rewards.seeds), num_str(rewards.pine_cones) );
 
       if (rewards.biome_material)
       {
         struct File biome_material_file = biomes[player.biome].biome_material;
         ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION,
-            "\n+**%d** <:%s:%ld> %s \n", 
-            rewards.biome_material,
+            "\n+**%s** <:%s:%ld> %s \n", 
+            num_str(rewards.biome_material),
             biome_material_file.emoji_name, biome_material_file.emoji_id, biome_material_file.formal_name);
       }
       break;
@@ -161,14 +166,17 @@ void generate_rewards(
       ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION, "You received no earnings! \n");
   }
 
-  if (rewards.stolen_acorns)
-    ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION, "\nYou successfully stole **%d** "ACORNS" Acorns! \n+**%d** "COURAGE" Courage\n", 
-        rewards.stolen_acorns, rewards.courage);
-    
   if (rewards.golden_acorns)
-    ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION, "\n+**%d** "GOLDEN_ACORNS" Golden Acorns \n", rewards.golden_acorns);
+    ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION, "\n+**%s** "GOLDEN_ACORNS" Golden Acorns \n", num_str(rewards.golden_acorns));
 
-  energy_status(discord_msg);
+  if (rewards.catnip)
+    ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION, "\n+**%s** "CATNIP" Catnip \n", num_str(rewards.catnip));
+
+  if (rewards.stolen_acorns)
+    ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION, "\nYou successfully stole **%s** "STOLEN_ACORNS" War Acorns! \n+**%s** "COURAGE" Courage\n", 
+        num_str(rewards.stolen_acorns), num_str(rewards.courage) );
+
+  energy_status(discord_msg, MAIN_ENERGY_COST);
   check_level(discord_msg);
 }
 
@@ -323,9 +331,6 @@ void main_embed(
   }
 
   embed->image = discord_set_embed_image( fill_git_url(biomes[player.biome].biome_scene_path) );
-
-  if (embed->thumbnail)
-    printf("%s \n", embed->thumbnail->url);
 }
 
 /* Listens for slash command interactions */
