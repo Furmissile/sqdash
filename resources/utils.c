@@ -319,7 +319,7 @@ void energy_regen()
 
 void signal_shutdown()
 {
-  discord_create_message(client, 1017203573890752522,
+  discord_create_message(client, MAIN_CHANNEL_ID,
     &(struct discord_create_message)
     {
       .content = format_str(SIZEOF_DESCRIPTION, "The bot has gone "HELP_MARKER" **offline**!")
