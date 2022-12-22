@@ -26,7 +26,7 @@ char* is_color(struct discord *client, const struct discord_interaction *event, 
   }
 
   player.color = (int)strtol(input, NULL, 16);
-  player.acorns -= 2500;
+  player.acorns -= COLOR_COST;
 
   return input;
 }
@@ -71,7 +71,6 @@ int color_interaction(
   discord_create_interaction_response(client, event->id, event->token, &interaction, NULL);
 
   discord_embed_cleanup(msg->embed);
-  free(msg->buttons);
   free(msg);
 
   update_player_row(event->member->user->id, player);
