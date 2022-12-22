@@ -59,7 +59,7 @@ int scurry_info(
   const struct discord_interaction *event, 
   struct Message *discord_msg)
 {
-  ERROR_INTERACTION((player.scurry_id == 0), "You are not in a scurry yet!");
+  ERROR_INTERACTION((!event->data->custom_id && player.scurry_id == 0), "You are not in a scurry yet!");
 
   ERROR_INTERACTION((event->data->custom_id && player.user_id != scurry.scurry_owner_id), 
       "You do not have the permission to press this button!");
@@ -102,14 +102,14 @@ int scurry_info(
 
   embed->fields->array[SCURRY_RANKINGS].name = format_str(SIZEOF_TITLE, "Participation");
 
-  PGresult* rankings = SQL_query("select * from public.player where scurry_id = %ld order by stolen_acorns desc", player.scurry_id);
+  PGresult* rankings = SQL_query("select * from public.player where scurry_id = %ld order by stolen_acorns desc", scurry.scurry_owner_id);
 
   int total_score = 0;
   for (int i = 0; i < PQntuples(rankings); i++) 
   {
     int stolen_acorns = strtoint(PQgetvalue(rankings, i, DB_STOLEN_ACORNS));
     ADD_TO_BUFFER(ranking_pos, SIZEOF_FIELD_VALUE,
-        " "INDENT" %s <@!%ld> **%s** \n",
+        " "INDENT" %s <@%ld> **%s** \n",
         (i < 3) ? STAHR : (i < 8) ? SILVER_STAHR : BRONZE_STAHR, 
         strtobigint(PQgetvalue(rankings, i, DB_USER_ID)),
         num_str(stolen_acorns) );
@@ -131,14 +131,22 @@ int scurry_info(
 }
 
 /* Called on scurry_invite command */
-void s_info_interaction(
+int s_info_interaction(
   struct discord *client, 
   const struct discord_interaction *event, 
   struct Message *msg) 
 {
-  // currently only loads to check player stats
   player = load_player_struct(event->member->user->id);
-  scurry = load_scurry_struct(player.scurry_id);
+
+  if (event->data->options)
+  {
+    PGresult* get_scurry = SQL_query("select * from public.scurry where s_name like '%s'", event->data->options->array[0].value);
+    ERROR_DATABASE_RET((PQntuples(get_scurry) == 0), "This scurry doesn't exist!", get_scurry);
+
+    scurry = load_scurry_struct(strtobigint(PQgetvalue(get_scurry, 0, DB_SCURRY_OWNER_ID)));
+  }
+  else
+    scurry = load_scurry_struct(player.scurry_id);
 
   //Load Author
   msg->embed->author = discord_set_embed_author(
@@ -147,8 +155,8 @@ void s_info_interaction(
         event->member->user->id, event->member->user->avatar) );
 
   //if an error is returned, an interaction was already generated
-  if ( scurry_info(client, event, msg) ) 
-    return;
+  if ( scurry_info(client, event, msg) == ERROR_STATUS ) 
+    return 0;
 
   struct discord_interaction_response interaction = 
   {
@@ -178,6 +186,7 @@ void s_info_interaction(
   free(msg->buttons);
   free(msg);
 
-  update_player_row(event->member->user->id, player);
   update_scurry_row(scurry);
+
+  return 0;
 }

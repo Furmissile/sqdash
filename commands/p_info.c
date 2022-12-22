@@ -9,6 +9,47 @@ This file handles displaying player info (no buttons exist)
   - Has buttons for biome swapping
 */
 
+void create_info_interaction(
+  struct discord *client,
+  const struct discord_interaction *event,
+  struct Message *msg)
+{
+  struct discord_component action_rows = {
+    .type = DISCORD_COMPONENT_ACTION_ROW,
+    .components = msg->buttons
+  };
+
+  struct discord_interaction_response interaction = 
+  {
+    .type = (event->data->custom_id) ? DISCORD_INTERACTION_UPDATE_MESSAGE : DISCORD_INTERACTION_CHANNEL_MESSAGE_WITH_SOURCE,
+
+    .data = &(struct discord_interaction_callback_data) 
+    {
+      .embeds = &(struct discord_embeds) 
+      {
+        .array = msg->embed,
+        .size = 1
+      },
+      .components = &(struct discord_components) {
+        .array = &action_rows,
+        .size = 1
+      }
+    }
+
+  };
+
+  discord_create_interaction_response(client, event->id, event->token, &interaction, NULL);
+
+  discord_embed_cleanup(msg->embed);
+  free(msg->buttons);
+  free(msg);
+
+  if (event->data->custom_id)
+    update_player_row(player.user_id, player);
+  // scurry doesnt need to be updated!
+  scurry = (struct Scurry) { 0 };
+}
+
 struct discord_components* build_biome_buttons(
   const struct discord_interaction *event,
   int button_size)
@@ -96,12 +137,21 @@ enum INFO_FORMAT {
   INFO_SIZE
 };
 
-/* Builds parts of the player info embed */
-void player_info(
-  const struct discord_interaction *event,
-  struct Message *discord_msg)
+void p_info(struct discord *client, struct discord_response *resp, const struct discord_user *user)
 {
+  const struct discord_interaction *event = resp->keep;
+  struct Message *discord_msg = resp->data;
+
   struct discord_embed *embed = discord_msg->embed;
+
+  energy_regen();
+
+  //Load Author
+  discord_msg->embed->author = discord_set_embed_author(
+    format_str(SIZEOF_TITLE, user->username),
+    format_str(SIZEOF_URL, "https://cdn.discordapp.com/avatars/%lu/%s.png", 
+        user->id, user->avatar) );
+
   embed->color = player.color;
 
   embed->title = format_str(SIZEOF_TITLE, "Player Info");
@@ -121,10 +171,18 @@ void player_info(
       " "INDENT" "ACORNS" Acorns: **%s** \n"
       " "INDENT" "GOLDEN_ACORNS" Golden Acorns: **%s** \n"
       " "INDENT" "SEEDS" Seeds: **%s** \n"
-      " "INDENT" "PINE_CONES" Pine Cones: **%s** \n",
+      " "INDENT" "PINE_CONES" Pine Cones: **%s** \n"
+      " "INDENT" "ACORN_COUNT" Acorn Count: **%s** \n",
       player.energy, MAX_ENERGY,
       player.level, percent, num_str(player.acorns), 
-      num_str(player.golden_acorns), num_str(player.materials.seeds), num_str(player.materials.pine_cones) );
+      num_str(player.golden_acorns), num_str(player.materials.seeds), num_str(player.materials.pine_cones),
+      num_str(player.acorn_count) );
+
+  struct tm *info = get_UTC();
+
+  if (info->tm_mday > 21)
+  ADD_TO_BUFFER(embed->fields->array[INFO_GENERAL].value, SIZEOF_FIELD_VALUE,
+      " "INDENT" "CATNIP" Catnip: **%s** \n", num_str(player.catnip) );
   
   if (player.scurry_id > 0)
     ADD_TO_BUFFER(embed->fields->array[INFO_GENERAL].value, SIZEOF_FIELD_VALUE,
@@ -171,6 +229,16 @@ void player_info(
 
   /* Loads buttons for biome swap */
   discord_msg->buttons = build_biome_buttons(event, player.max_biome +1);
+
+  create_info_interaction(client, event, discord_msg);
+}
+
+void info_error(struct discord *client, struct discord_response *resp)
+{
+  const struct discord_interaction *event = resp->keep;
+
+  // no need to call create_info_interaction since error_messsage already responded!
+  error_message(client, event, "This is an invalid player!");
 }
 
 /* Listens for slash command interactions */
@@ -179,57 +247,24 @@ int info_interaction(
   const struct discord_interaction *event, 
   struct Message *msg) 
 {
-  struct discord_user target_user = { 0 };
+  unsigned long user_id = (event->data->options) ? strtobigint(trim_user_id(event->data->options->array[0].value)) : event->member->user->id;
 
-  if (retrieve_discord_user(client, event, &target_user) == ERROR_STATUS)
-    return 1;
+  PGresult* search_player = SQL_query("select * from public.player where user_id = %ld", user_id);
 
-  player = load_player_struct(target_user.id);
+  ERROR_DATABASE_RET((PQntuples(search_player) == 0), "This player does not exist!", search_player);
+  PQclear(search_player);
+
+  player = load_player_struct(user_id);
   scurry = load_scurry_struct(player.scurry_id);
 
-  energy_regen();
-  //Load Author
-  msg->embed->author = discord_set_embed_author(
-    format_str(SIZEOF_TITLE, target_user.username),
-    format_str(SIZEOF_URL, "https://cdn.discordapp.com/avatars/%lu/%s.png", 
-        target_user.id, target_user.avatar) );
-
-  player_info(event, msg);
-
-  struct discord_component action_rows = {
-    .type = DISCORD_COMPONENT_ACTION_ROW,
-    .components = msg->buttons
+  struct discord_ret_user ret_user = {
+    .done = &p_info,
+    .fail = &info_error,
+    .data = msg,
+    .keep = event
   };
 
-  struct discord_interaction_response interaction = 
-  {
-    .type = (event->data->custom_id) ? DISCORD_INTERACTION_UPDATE_MESSAGE : DISCORD_INTERACTION_CHANNEL_MESSAGE_WITH_SOURCE,
-
-    .data = &(struct discord_interaction_callback_data) 
-    {
-      .embeds = &(struct discord_embeds) 
-      {
-        .array = msg->embed,
-        .size = 1
-      },
-      .components = &(struct discord_components) {
-        .array = &action_rows,
-        .size = 1
-      }
-    }
-
-  };
-
-  discord_create_interaction_response(client, event->id, event->token, &interaction, NULL);
-
-  discord_embed_cleanup(msg->embed);
-  free(msg->buttons);
-  free(msg);
-
-  if (event->data->custom_id)
-    update_player_row(player.user_id, player);
-  // scurry doesnt need to be updated!
-  scurry = (struct Scurry) { 0 };
+  discord_get_user(client, user_id, &ret_user);
 
   return 0;
 }
