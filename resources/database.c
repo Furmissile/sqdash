@@ -22,14 +22,13 @@ PGconn* establish_connection(char* conninfo)
 
 struct Player load_player_struct(unsigned long user_id)
 {
-  PGresult* search_player = SQL_query("select * from public.player where user_id = %ld", user_id);
+  PGresult* search_player = SQL_query("select * from public.player where user_id = %ld",
+    user_id);
 
   if (PQntuples(search_player) == 0)
   {
-    PQclear(search_player);
-
     SQL_query("BEGIN; \
-      insert into public.player values(%ld, 1, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0); \
+      insert into public.player values(%ld, 1, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0); \
       insert into public.materials values(%ld, 0, 0, 0, 0, 0, 0, 0); \
       insert into public.stats values(%ld, 1, 1, 1, 1, 1); \
       insert into public.buffs values(%ld, 0, 0, 0, 0, 0); \
@@ -37,12 +36,14 @@ struct Player load_player_struct(unsigned long user_id)
       user_id, user_id, user_id, user_id);
   }
 
+  PQclear(search_player);
+
   search_player = SQL_query("select * from public.player \
-      join public.materials on player.user_id = materials.user_id \
-      join public.stats on player.user_id = stats.user_id \
-      join public.buffs on player.user_id = buffs.user_id \
-      where player.user_id = %ld",
-      user_id);
+    join public.materials on player.user_id = materials.user_id \
+    join public.stats on player.user_id = stats.user_id \
+    join public.buffs on player.user_id = buffs.user_id \
+    where player.user_id = %ld",
+    user_id);
 
   player = (struct Player) { 0 };
 
@@ -56,12 +57,13 @@ struct Player load_player_struct(unsigned long user_id)
     .biome = strtoint( PQgetvalue(search_player, 0, DB_BIOME) ),
     .select_encounter = strtoint( PQgetvalue(search_player, 0, DB_SELECT_ENCOUNTER) ),
     .color = strtoint( PQgetvalue(search_player, 0, DB_COLOR) ),
-    .main_cd = strtobigint(PQgetvalue(search_player, 0, DB_MAIN_CD) ),
+    .main_cd = strtobigint( PQgetvalue(search_player, 0, DB_MAIN_CD) ),
     .energy = strtoint( PQgetvalue(search_player, 0, DB_ENERGY) ),
     .golden_acorns = strtoint( PQgetvalue(search_player, 0, DB_GOLDEN_ACORNS) ),
-    .scurry_id = strtobigint(PQgetvalue(search_player, 0, DB_SCURRY_ID) ),
+    .scurry_id = strtobigint( PQgetvalue(search_player, 0, DB_SCURRY_ID) ),
     .stolen_acorns = strtoint( PQgetvalue(search_player, 0, DB_STOLEN_ACORNS) ),
-    .passive_acorns = strtoint( PQgetvalue(search_player, 0, DB_PASSIVE_ACORNS) ),
+    .acorn_count = strtoint( PQgetvalue(search_player, 0, DB_ACORN_COUNT) ),
+    .catnip = strtoint( PQgetvalue(search_player, 0, DB_CATNIP) ),
 
     .materials = {
       .pine_cones = strtoint( PQgetvalue(search_player, 0, DB_PINE_CONES) ),
@@ -90,9 +92,9 @@ struct Player load_player_struct(unsigned long user_id)
     }
   };
 
-  PQclear(search_player);
-
   player_res.max_biome = factor_biome(player_res.level);
+
+  PQclear(search_player);
 
   return player_res;
 }
@@ -104,6 +106,8 @@ struct Scurry load_scurry_struct(unsigned long scurry_id)
   if (scurry_id > 0)
   {
     PGresult* scurry_db = SQL_query("select * from public.scurry where owner_id = %ld", scurry_id);
+
+    scurry = (struct Scurry) { 0 };
 
     scurry_res = (struct Scurry) 
     {
@@ -170,11 +174,12 @@ void update_player_row(unsigned long user_id, struct Player player_res)
       golden_acorns = %d, \
       scurry_id = %ld, \
       stolen_acorns = %d, \
-      passive_acorns = %d \
+      acorn_count = %d, \
+      catnip = %d \
     where user_id = %ld;",
       player_res.level, player_res.xp, player_res.acorns, player_res.biome, player_res.select_encounter,
       player_res.color, player_res.main_cd, player_res.energy, player_res.golden_acorns, player_res.scurry_id,
-      player_res.stolen_acorns,player_res.passive_acorns, user_id);
+      player_res.stolen_acorns,player_res.acorn_count, player_res.catnip, user_id);
   
   ADD_TO_BUFFER(sql_str, SIZEOF_SQL_COMMAND,
     "update public.materials set \

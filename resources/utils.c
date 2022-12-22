@@ -255,38 +255,47 @@ int retrieve_discord_user(struct discord *client, const struct discord_interacti
   unsigned long target_id = (event->data->options) ? strtobigint(trim_user_id(event->data->options->array[0].value))
     : event->member->user->id;
 
-  printf("%ld \n", target_id);
   ERROR_INTERACTION(
     (target_id == (unsigned long)ERROR_STATUS || discord_get_user(client, target_id, &ret_user) != CCORD_OK), 
     "This is an invalid user!" );
-  
-  PGresult* locate_player = SQL_query("select user_id from public.player where user_id = %ld", target_id);
-  ERROR_DATABASE_RET((PQntuples(locate_player) == 0), "This player cannot be found!", locate_player);
-  PQclear(locate_player);
 
   return 0;
 }
 
-void energy_status(struct Message *discord_msg)
+void energy_status(struct Message *discord_msg, int energy_loss)
 {
   struct discord_embed *embed = discord_msg->embed;
 
-  if (rand() % MAX_CHANCE < 80)
+  if (energy_loss == STEAL_ENERGY_COST
+    || (rand() % MAX_CHANCE < 80 && energy_loss == MAIN_ENERGY_COST) )
   {
-    // if (player.user_id != OWNER_ID)
-      player.energy -= 2;
+    player.energy -= energy_loss;
 
     embed->footer = discord_set_embed_footer(
         format_str(SIZEOF_FOOTER_TEXT, "You have %d energy left!", player.energy),
         fill_git_url(items[ITEM_ENERGY].file_path));
     
     ADD_TO_BUFFER(embed->description, SIZEOF_DESCRIPTION,
-        "\n-**2** "ENERGY" Energy \n");
+        "\n-**%d** "ENERGY" Energy \n", energy_loss);
   }
-  else {
+  else if (energy_loss == MAIN_ENERGY_COST) 
+  {
     ADD_TO_BUFFER(embed->description, SIZEOF_DESCRIPTION,
         "\n"ENERGY" No energy was lost! \n");
   }
+  else {
+    printf("An invalid energy value was passed! \n");
+  }
+}
+
+struct tm* get_UTC()
+{
+  time_t rawtime;
+  struct tm *info;
+  time(&rawtime);
+  info = gmtime(&rawtime);
+
+  return info;
 }
 
 void energy_regen() 
@@ -306,4 +315,17 @@ void energy_regen()
 
   // wont disturb cooldown when info embed is sent
   player.main_cd = time(NULL) - ((time(NULL) - player.main_cd) % BASE_ENERGY_CD);
+}
+
+void signal_shutdown()
+{
+  discord_create_message(client, 1017203573890752522,
+    &(struct discord_create_message)
+    {
+      .content = format_str(SIZEOF_DESCRIPTION, "The bot has gone "HELP_MARKER" **offline**!")
+    },
+    NULL);
+
+  discord_shutdown(client);
+  return;
 }

@@ -95,10 +95,12 @@ struct Player {
   time_t main_cd;
   int energy;
 
-  int golden_acorns; //event currency
-
   unsigned long scurry_id;
   int stolen_acorns; // keeps track of player participation in a scurry war
+
+  int golden_acorns; //event currency
+  int acorn_count;
+  int catnip;
 
   struct Materials materials;
   struct Stats stats;
@@ -116,7 +118,9 @@ struct Rewards {
 
   int courage;
   int stolen_acorns;
+
   int golden_acorns;
+  int catnip;
 };
 
 struct Message {

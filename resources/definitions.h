@@ -18,9 +18,10 @@ enum DB_TUPLE {
   DB_GOLDEN_ACORNS,
   DB_SCURRY_ID,
   DB_STOLEN_ACORNS,
-  DB_PASSIVE_ACORNS,
+  DB_ACORN_COUNT,
+  DB_CATNIP,
 
-  DB_SEEDS = 15,
+  DB_SEEDS = 16,
   DB_PINE_CONES,
   DB_MOOSHRUMS,
   DB_CACTUS_FLOWERS,
@@ -28,13 +29,13 @@ enum DB_TUPLE {
   DB_BLUEBERRIES,
   DB_DARK_CHESTNUTS,
 
-  DB_SMELL_LV = 23,
+  DB_SMELL_LV = 24,
   DB_DEXTERITY_LV,
   DB_ACUITY_LV,
   DB_LUCK_LV,
   DB_PROFICIENCY_LV,
 
-  DB_SMELL_ACORN = 29,
+  DB_SMELL_ACORN = 30,
   DB_ENDURANCE_ACORN,
   DB_ACUITY_ACORN,
   DB_LUCK_ACORN,
@@ -72,18 +73,21 @@ enum BIOME {
 /* Items */
 enum ITEMS {
   ITEM_ACORNS,
+  ITEM_CATNIP,
+  ITEM_COURAGE,
   ITEM_ENERGY,
   ITEM_GOLDEN_ACORN,
+  ITEM_ACORN_COUNT,
   ITEM_PINE_CONES,
   ITEM_SEEDS,
   ITEM_XP,
   ITEM_STAHR,
-  ITEM_PASSIVE_ACORN,
+  ITEM_MATERIALS,
+  ITEM_STOLEN_ACORNS,
   ITEM_SIZE
 };
 
-
-const struct File *items = (struct File[]) 
+struct File *items = (struct File[]) 
 {
   {
     .formal_name = "Acorns",
@@ -91,6 +95,20 @@ const struct File *items = (struct File[])
 
     .emoji_name = "acorns",
     .emoji_id = 1045028765392187402
+  },
+  {
+    .formal_name = "Catnip",
+    .file_path = "Items/catnip.png",
+
+    .emoji_name = "catnip",
+    .emoji_id = 1052250368039452732
+  },
+  {
+    .formal_name = "Courage",
+    .file_path = "Scurry%20Utils/courage.png",
+
+    .emoji_name = "courage",
+    .emoji_id = 1045555306832347147
   },
   {
     .formal_name = "Energy",
@@ -105,6 +123,13 @@ const struct File *items = (struct File[])
 
     .emoji_name = "golden_acorn",
     .emoji_id = 1045032005420728430
+  },
+  {
+    .formal_name = "Acorn Count",
+    .emoji_name = "acorn_count",
+
+    .file_path = "Items/acorn_count.png",
+    .emoji_id = 1050407923823677502
   },
   {
     .formal_name = "Pine Cones",
@@ -129,16 +154,24 @@ const struct File *items = (struct File[])
   },
   {
     .formal_name = "Level",
+    .file_path = "Item%20Types/stahr.png",
 
     .emoji_name = "stahr",
     .emoji_id = 1045705606134251601
   },
   {
-    .formal_name = "Passive Acorns",
-    .emoji_name = "passive_acorns",
+    .formal_name = "Materials",
+    .file_path = "Items/materials.png",
 
-    .emoji_id = 1050407923823677502
-    // .file_path = "Items/passive_acorns.png"
+    .emoji_name = "materials",
+    .emoji_id = 1052960475534602330
+  },
+  {
+    .formal_name = "Stolen Acorns",
+    .file_path = "Items/stolen_acorn.png",
+
+    .emoji_name = "stolen_acorns",
+    .emoji_id = 1055143210839720067
   }
 
 };
@@ -156,7 +189,7 @@ enum ITEM_TYPE {
   TYPE_SIZE
 };
 
-const struct File *item_types = (struct File[]) 
+struct File *item_types = (struct File[]) 
 {
   {
     .formal_name = "a Handful of Acorns",
@@ -221,7 +254,7 @@ enum BUFFS {
   BUFF_SIZE
 };
 
-const struct File *enchanted_acorns = (struct File[])
+struct File *enchanted_acorns = (struct File[])
 {
   {
     .formal_name = "Acorn of Acuity",
@@ -281,7 +314,7 @@ enum SQUIRREL_STATS {
   STAT_SIZE
 };
 
-const struct File *stat_files = (struct File[])
+struct File *stat_files = (struct File[])
 {
   {
     .formal_name = "Smell", // GL
@@ -310,7 +343,7 @@ enum SQUIRREL {
   GRAY_SQUIRREL
 };
 
-const struct File *squirrels = (struct File[])
+struct File *squirrels = (struct File[])
 {
   {
     .formal_name = "Gray Squirrel",
@@ -321,7 +354,7 @@ const struct File *squirrels = (struct File[])
   }
 };
 
-const struct File *evo_squirrels = (struct File[])
+struct File *evo_squirrels = (struct File[])
 {
   {
     .formal_name = "Evolutions",
@@ -339,7 +372,7 @@ struct Scurry scurry = { 0 };
 struct Rewards rewards = { 0 };
 
 /* Biomes */
-const struct Biome *biomes = (struct Biome[])
+struct Biome *biomes = (struct Biome[])
 {
   { // GRASSLANDS
     .biome_material = {
