@@ -30,7 +30,11 @@
 #define SQ_BOOKIE_PATH "Squirrel%20Dash%20Utils/squirrel_bookie.png"
 #define WELCOME_MSG_PATH "Squirrel%20Dash%20Utils/welcome_gif.gif"
 #define RULES_BK_PATH "Squirrel%20Dash%20Utils/rules_book.png"
+#define BUNNY_ED_PATH "Squirrel%20Dash%20Utils/bunny.png"
 #define VERIFY_PLUS_PATH "Symbols/plus.png"
+
+#define ACORN_LB_ICON_PATH
+#define COURAGE_LB_ICON_PATH
 
 // SUPPORT SERVER SPECIFIC IDS
 #define WELCOME_CHANNEL_ID 1046634205729275955
@@ -43,7 +47,7 @@
 #define ACTION_UNDEFINED 0x0
 
 #define sq_num(num) ( (num) * (num) )
-#define req_xp(level) sq_num(level * 5) +125
+#define req_xp(level) sq_num(level * 6) +125
 
 #define SCURRY_MEMBER_MAX 15
 #define SCURRY_MEMBER_REQ 5 // requirement to participate in wars
@@ -73,9 +77,9 @@
 #define COOLDOWN 3
 #define BASE_ENERGY_CD 180 //3 minutes/ energy
 #define INVITE_CD 120
+#define MAIN_ENERGY_COST 2
 #define STEAL_ENERGY_COST 20
 
-#define WEEKLY_RESET 604800 //seconds in a week
 
 /* @@@ CHANCE DATA @@@ */
 #define JUNK_CHANCE      10  // 10 % -- No acorns
@@ -89,12 +93,23 @@
 #define MAX_MATERIAL_CHANCE 60 //highest chance to get a biome material
 
 
+// Bunny's Endeavor
+#define CATNIP_UNIT_COST 100
+
+#define ACORN_QUANTITY 5000
+#define MATERIAL_QUANTITY 15
+#define GOLDEN_ACORN_QUANTITY 200
+#define BIOME_MATERIAL_QUANTITY 5
+#define ENERGY_QUANTITY 20
+
+
 /* @@@ INTERACTION TYPES  @@@ */
 #define TYPE_MAIN_MSG 'r'
 #define TYPE_ENCOUNTER_MSG 'e'
 
 #define TYPE_STORE 's'
 #define TYPE_SEEDY 'd'
+#define TYPE_BUNNY 'y'
 #define TYPE_BIOME 'b'
 #define TYPE_E_ACORN 'a'
 #define TYPE_INVITE 'i'
@@ -116,6 +131,7 @@
 
 #define SIZEOF_SCURRY_NAME 16
 
+
 /* @@@ STAT CONSTANTS @@@ */
 #define STAT_EVOLUTION 5
 
@@ -128,6 +144,8 @@
 #define ACORN_BUFF_COST 2500
 #define SEEDS_BUFF_COST 25
 #define BIOME_MATERIAL_BUFF_COST 5
+
+#define COLOR_COST 1500
 
 // seedy market purchase value
 #define BASE_SEEDY_PURCHASE 200
@@ -252,5 +270,6 @@ XP_MULTIPLIER
 #define OPPOSING_SCURRY "<:opposing_scurry:1037000813291241524>"
 #define LEADER "<:leader:1035976066965196861>"
 #define COURAGE "<:courage:1045555306832347147>"
+#define STOLEN_ACORNS "<:stolen_acorn:1055143210839720067>"
 
-#define PASSIVE_ACORNS "<:passive_acorns:1050407923823677502>"
+#define ACORN_COUNT "<:passive_acorns:1050407923823677502>"
