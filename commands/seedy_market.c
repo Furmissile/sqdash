@@ -126,7 +126,7 @@ void seedy_shop(
     //References
     struct File biome_material = biomes[biome_index].biome_material;
 
-    embed->fields->array[i].name = format_str(SIZEOF_TITLE, "> 5 <:%s:%ld> %s", 
+    embed->fields->array[i].name = format_str(SIZEOF_TITLE, "5 <:%s:%ld> %s", 
         biome_material.emoji_name, biome_material.emoji_id, biome_material.formal_name);
     
     embed->fields->array[i].value = format_str(SIZEOF_FIELD_VALUE,
