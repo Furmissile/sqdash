@@ -30,7 +30,7 @@ char* fill_git_url(char* file_path) {
   return url_buffer;
 }
 
-PGresult* SQL_query(char* format, ...)
+PGresult* SQL_query(PGconn* db_conn, char* format, ...)
 {
   char* buffer = calloc(SIZEOF_SQL_COMMAND, sizeof(char));
 
@@ -42,7 +42,7 @@ PGresult* SQL_query(char* format, ...)
 
   va_end(args);
 
-  PGresult* query = PQexec(conn, buffer);
+  PGresult* query = PQexec(db_conn, buffer);
 
   free(buffer);
 
