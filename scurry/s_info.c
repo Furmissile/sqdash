@@ -16,7 +16,7 @@ struct discord_component* build_war_button(const struct discord_interaction *eve
   buttons->array = calloc(1, sizeof(struct discord_component));
   buttons->size = 1;
 
-  PGresult* scurry_members = SQL_query("select * from public.player where scurry_id = %ld", player.scurry_id);
+  PGresult* scurry_members = SQL_query(conn, "select * from public.player where scurry_id = %ld", player.scurry_id);
 
   buttons->array[0] = (scurry.war_flag == 0) ?
   (struct discord_component)
@@ -67,7 +67,7 @@ int scurry_info(
   if (event->data->custom_id && scurry.war_flag == 0)
   {
     scurry.war_flag = 1;
-    SQL_query("update public.player set stolen_acorns = 0 where scurry_id = %ld", scurry.scurry_owner_id);
+    SQL_query(conn, "update public.player set stolen_acorns = 0 where scurry_id = %ld", scurry.scurry_owner_id);
     scurry.courage = 0;
   }
   else if (event->data->custom_id && scurry.war_flag == 1)
@@ -102,7 +102,7 @@ int scurry_info(
 
   embed->fields->array[SCURRY_RANKINGS].name = format_str(SIZEOF_TITLE, "Participation");
 
-  PGresult* rankings = SQL_query("select * from public.player where scurry_id = %ld order by stolen_acorns desc", scurry.scurry_owner_id);
+  PGresult* rankings = SQL_query(conn, "select * from public.player where scurry_id = %ld order by stolen_acorns desc", scurry.scurry_owner_id);
 
   int total_score = 0;
   for (int i = 0; i < PQntuples(rankings); i++) 
@@ -140,7 +140,7 @@ int s_info_interaction(
 
   if (event->data->options)
   {
-    PGresult* get_scurry = SQL_query("select * from public.scurry where s_name like '%s'", event->data->options->array[0].value);
+    PGresult* get_scurry = SQL_query(conn, "select * from public.scurry where s_name like '%s'", event->data->options->array[0].value);
     ERROR_DATABASE_RET((PQntuples(get_scurry) == 0), "This scurry doesn't exist!", get_scurry);
 
     scurry = load_scurry_struct(strtobigint(PQgetvalue(get_scurry, 0, DB_SCURRY_OWNER_ID)));

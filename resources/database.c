@@ -22,12 +22,12 @@ PGconn* establish_connection(char* conninfo)
 
 struct Player load_player_struct(unsigned long user_id)
 {
-  PGresult* search_player = SQL_query("select * from public.player where user_id = %ld",
+  PGresult* search_player = SQL_query(conn, "select * from public.player where user_id = %ld",
     user_id);
 
   if (PQntuples(search_player) == 0)
   {
-    SQL_query("BEGIN; \
+    SQL_query(conn, "BEGIN; \
       insert into public.player values(%ld, 1, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0); \
       insert into public.materials values(%ld, 0, 0, 0, 0, 0, 0, 0); \
       insert into public.stats values(%ld, 1, 1, 1, 1, 1); \
@@ -38,7 +38,7 @@ struct Player load_player_struct(unsigned long user_id)
 
   PQclear(search_player);
 
-  search_player = SQL_query("select * from public.player \
+  search_player = SQL_query(conn, "select * from public.player \
     join public.materials on player.user_id = materials.user_id \
     join public.stats on player.user_id = stats.user_id \
     join public.buffs on player.user_id = buffs.user_id \
@@ -105,7 +105,7 @@ struct Scurry load_scurry_struct(unsigned long scurry_id)
 
   if (scurry_id > 0)
   {
-    PGresult* scurry_db = SQL_query("select * from public.scurry where owner_id = %ld", scurry_id);
+    PGresult* scurry_db = SQL_query(conn, "select * from public.scurry where owner_id = %ld", scurry_id);
 
     scurry = (struct Scurry) { 0 };
 
@@ -218,7 +218,7 @@ void update_player_row(unsigned long user_id, struct Player player_res)
       player_res.buffs.smell_acorn, player_res.buffs.endurance_acorn, player_res.buffs.acuity_acorn, player_res.buffs.luck_acorn,
       player_res.buffs.proficiency_acorn, user_id);
 
-  SQL_query(sql_str);
+  SQL_query(conn, sql_str);
 
   free(sql_str);
 }

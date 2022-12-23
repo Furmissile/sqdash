@@ -249,7 +249,7 @@ int info_interaction(
 {
   unsigned long user_id = (event->data->options) ? strtobigint(trim_user_id(event->data->options->array[0].value)) : event->member->user->id;
 
-  PGresult* search_player = SQL_query("select * from public.player where user_id = %ld", user_id);
+  PGresult* search_player = SQL_query(conn, "select * from public.player where user_id = %ld", user_id);
 
   ERROR_DATABASE_RET((PQntuples(search_player) == 0), "This player does not exist!", search_player);
   PQclear(search_player);

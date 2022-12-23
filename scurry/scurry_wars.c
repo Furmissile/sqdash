@@ -53,7 +53,7 @@ void scurry_war_update(const struct discord_interaction *event)
   }
 
   // search for another scurry
-  PGresult* opponents = SQL_query("select owner_id from public.scurry where owner_id != %ld and war_flag = 1",
+  PGresult* opponents = SQL_query(conn, "select owner_id from public.scurry where owner_id != %ld and war_flag = 1",
       scurry.scurry_owner_id);
   
   if (PQntuples(opponents) > 0)

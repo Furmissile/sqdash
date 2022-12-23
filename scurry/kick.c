@@ -22,7 +22,7 @@ void create_kick_interaction(
 {
   struct Message *msg = kick_info->discord_msg;
   // kick user by setting id = 0
-  SQL_query("update public.player set scurry_id = 0 where user_id = %ld", kick_info->t_user_id);
+  SQL_query(conn, "update public.player set scurry_id = 0 where user_id = %ld", kick_info->t_user_id);
 
   msg->content = format_str(SIZEOF_DESCRIPTION, 
       "%s has been kicked from **%s**!", kick_info->username, scurry.scurry_name);
@@ -103,7 +103,7 @@ int kick_interaction(
   //check if target user is trying to kick self
   ERROR_INTERACTION((kick_info->t_user_id == event->member->user->id), "You can't kick yourself silly!");
 
-  PGresult* target_user = SQL_query("select * from public.player where user_id = %ld and scurry_id = %ld", 
+  PGresult* target_user = SQL_query(conn, "select * from public.player where user_id = %ld and scurry_id = %ld", 
       kick_info->t_user_id, event->member->user->id);
 
   // make sure scurry id matches owner id so you cant kick other scurry's members

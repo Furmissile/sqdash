@@ -138,12 +138,12 @@ void invite_response(struct discord *client, struct discord_response *resp, cons
   const struct discord_interaction *event = resp->keep;
 
   // get the scurry info for its name -- scurry must be present if it got this far
-  PGresult* get_scurry = SQL_query("select * from public.scurry where owner_id = %ld", event->user->id);
+  PGresult* get_scurry = SQL_query(conn, "select * from public.scurry where owner_id = %ld", event->user->id);
 
   unsigned long user_id = strtobigint(PQgetvalue(pending_invite, 0, DB_INVITE_USER));
 
   if (event->data->custom_id[1] - 48 == 0)
-    SQL_query("update public.player set scurry_id = %ld where user_id = %ld", event->user->id, user_id );
+    SQL_query(conn, "update public.player set scurry_id = %ld where user_id = %ld", event->user->id, user_id );
   
   // message that gets sent to channel of original interaction
   discord_create_message(client, strtobigint(PQgetvalue(pending_invite, 0, DB_INVITE_CHANNEL)),
@@ -207,7 +207,7 @@ void invite_response(struct discord *client, struct discord_response *resp, cons
     },
     NULL);
   
-  SQL_query("delete from public.invites where request_id = %ld", 
+  SQL_query(conn, "delete from public.invites where request_id = %ld", 
       strtobigint(PQgetvalue(pending_invite, 0, DB_INVITE_MSG)) );
 }
 
@@ -219,7 +219,7 @@ void invite_success(struct discord *client, struct discord_response *resp, const
 
   const struct discord_interaction *event = resp->keep;
 
-  SQL_query("INSERT INTO public.invites VALUES(%ld, %ld, %ld, %ld, %ld)", 
+  SQL_query(conn, "INSERT INTO public.invites VALUES(%ld, %ld, %ld, %ld, %ld)", 
       invite_info->owner_id, event->member->user->id, message->id, event->channel_id, time(NULL) + INVITE_CD);
 
   // author here has already been created by invite_interaction!
@@ -250,7 +250,7 @@ void send_invite_dm(struct discord *client, struct discord_response *resp, const
   discord_create_message(client, channel->id,
     &(struct discord_create_message)
     {
-      .content = format_str(SIZEOF_DESCRIPTION, "<@!%ld> **Pending Request!**", invite_info->owner_id),
+      .content = format_str(SIZEOF_DESCRIPTION, "<@%ld> **Pending Request!**", invite_info->owner_id),
 
       .embeds = &(struct discord_embeds)
       {
@@ -264,7 +264,7 @@ void send_invite_dm(struct discord *client, struct discord_response *resp, const
                   event->member->user->id, event->member->user->avatar) ),
           .title = format_str(SIZEOF_TITLE, "User Invite"),
           .description = format_str(SIZEOF_DESCRIPTION,
-              "<@!%ld> has requested to join your scurry!", event->member->user->id)
+              "<@%ld> has requested to join your scurry!", event->member->user->id)
           }
         },
         .size = 1
@@ -288,14 +288,14 @@ int invite_interaction(struct discord *client,
   scurry = load_scurry_struct(player.scurry_id);
 
   // delete EXPIRED invites
-  SQL_query("delete from public.invites where t_stamp < %ld", time(NULL));
+  SQL_query(conn, "delete from public.invites where t_stamp < %ld", time(NULL));
 
   // if a button was pressed, this is a response
   if (event->data->custom_id)
   {
     ERROR_INTERACTION((scurry.war_flag == 1), "You cannot accept invites while at war! Please retreat or finish the war first.");
 
-    pending_invite = SQL_query("select * from public.invites where request_id = %ld", event->message->id);
+    pending_invite = SQL_query(conn, "select * from public.invites where request_id = %ld", event->message->id);
   
     if (PQntuples(pending_invite) == 0) {
       invite_expired(client, event);
@@ -316,7 +316,7 @@ int invite_interaction(struct discord *client,
   ERROR_INTERACTION((player.scurry_id > 0), "You are already in a scurry! Try leaving your current scurry.");
 
   // check scurry status and existence
-  PGresult* scurry_info = SQL_query("select * from public.scurry where s_name like '%s'", event->data->options->array[0].value);
+  PGresult* scurry_info = SQL_query(conn, "select * from public.scurry where s_name like '%s'", event->data->options->array[0].value);
   ERROR_DATABASE_RET((PQntuples(scurry_info) == 0), "Sorry, this scurry doesn't exist!", scurry_info);
   ERROR_DATABASE_RET((strtoint(PQgetvalue(scurry_info, 0, DB_WAR_FLAG)) == 1), 
       "This scurry is currently at war! Please wait until they are ready.", scurry_info);
@@ -325,12 +325,12 @@ int invite_interaction(struct discord *client,
   PQclear(scurry_info);
 
   // check scurry capacity
-  scurry_info = SQL_query("select * from public.player where scurry_id = %ld", owner_id );  
+  scurry_info = SQL_query(conn, "select * from public.player where scurry_id = %ld", owner_id );  
   ERROR_DATABASE_RET((PQntuples(scurry_info) == SCURRY_MEMBER_MAX), "This scurry is full!", scurry_info);
   PQclear(scurry_info);
 
   // check if user has a pending invite
-  scurry_info = SQL_query("select * from public.invites where player_id = %ld", event->member->user->id);
+  scurry_info = SQL_query(conn, "select * from public.invites where player_id = %ld", event->member->user->id);
   ERROR_DATABASE_RET((PQntuples(scurry_info) > 0), "You already have a pending request!", scurry_info);
 
   // invite info is used to pass information along functions

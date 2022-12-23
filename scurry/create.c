@@ -23,7 +23,7 @@ int scurry_create(
   ERROR_INTERACTION((strlen(input) > SIZEOF_SCURRY_NAME), 
       "The name needs to be less than 16 characters.");
   
-  PGresult* check_scurry = SQL_query("select * from public.scurry where s_name like '%s'", input);
+  PGresult* check_scurry = SQL_query(conn, "select * from public.scurry where s_name like '%s'", input);
   ERROR_DATABASE_RET(
       (PQntuples(check_scurry) > 0), 
       format_str(SIZEOF_DESCRIPTION, "Sorry, the name \"%s\" is already taken!", input), 
@@ -32,12 +32,12 @@ int scurry_create(
 
   struct discord_embed *embed = discord_msg->embed;
 
-  check_scurry = SQL_query("INSERT INTO public.scurry VALUES(%ld, '%s', 0, 0, 0)", 
+  check_scurry = SQL_query(conn, "INSERT INTO public.scurry VALUES(%ld, '%s', 0, 0, 0)", 
       event->member->user->id, input);
   PQclear(check_scurry);
 
   //Only set the player guild id to the 
-  check_scurry = SQL_query("select * from public.scurry where owner_id = %ld", event->member->user->id);
+  check_scurry = SQL_query(conn, "select * from public.scurry where owner_id = %ld", event->member->user->id);
   ERROR_DATABASE_RET((PQntuples(check_scurry) == 0), "An error has occurred. Scurry could not be found!", check_scurry);
 
   if (PQntuples(check_scurry) > 0) {

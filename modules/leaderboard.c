@@ -46,7 +46,7 @@ void create_leaderboard_interaction(struct discord *client, const struct discord
   if (user_data->is_top_ten == 0) 
   {
     // player position in leaderboard
-    player_pos = SQL_query("select row_idx, user_id, acorn_count \
+    player_pos = SQL_query(conn, "select row_idx, user_id, acorn_count \
         from (select dense_rank() over (order by acorn_count desc) as row_idx, user_id, acorn_count from public.player) \
         as lb where lb.user_id = %ld",
         player.user_id);
@@ -207,7 +207,7 @@ int get_leaderboard(
   {
     ERROR_INTERACTION((player.acorn_count == 0), "You must be have an acorn count to view this leaderboard!");
 
-    player_pos = SQL_query("select dense_rank() over (order by acorn_count desc) as rank_idx, user_id, acorn_count \
+    player_pos = SQL_query(conn, "select dense_rank() over (order by acorn_count desc) as rank_idx, user_id, acorn_count \
         from (select dense_rank() over (order by acorn_count desc) as rank_idx, user_id, acorn_count from public.player) as lb \
         where user_id != %ld and rank_idx <= 10 and acorn_count > 0", 
         OWNER_ID);
@@ -221,7 +221,7 @@ int get_leaderboard(
     ERROR_INTERACTION((player.scurry_id == 0), "You must be in a scurry to view this leaderboard!");
     ERROR_INTERACTION((scurry.courage == 0), "Your scurry must participate in a war to view this leaderboard!");
 
-    player_pos = SQL_query("select dense_rank() over (order by courage desc) as rank_idx, owner_id, s_name, courage \
+    player_pos = SQL_query(conn, "select dense_rank() over (order by courage desc) as rank_idx, owner_id, s_name, courage \
         from (select dense_rank() over (order by courage desc) as rank_idx, owner_id, s_name, courage from public.scurry) as lb \
         where lb.owner_id != %ld and rank_idx <= 10 and courage > 0", 
         OWNER_ID);
