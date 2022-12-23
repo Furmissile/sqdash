@@ -11,9 +11,11 @@
   #undef BETA
   #define BETA "beta_"
   #define APPLICATION_ID 1048439491607674930
+  #define STATUS_CHANNEL 1017203573890752522
 #else
   #define BETA
   #define APPLICATION_ID 905163158149287936
+  #define STATUS_CHANNEL 1046635264883294259
 #endif
 
 #define genrand(base, range) ( (rand() % (range +1)) + base ) // range +1 since rand is [base, range)
@@ -94,7 +96,7 @@
 
 
 // Bunny's Endeavor
-#define CATNIP_UNIT_COST 100
+#define CATNIP_UNIT_COST 200
 
 #define ACORN_QUANTITY 5000
 #define MATERIAL_QUANTITY 15
