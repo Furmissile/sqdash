@@ -164,19 +164,26 @@ void p_info(struct discord *client, struct discord_response *resp, const struct 
   float req_xp = req_xp(player.level);
   float percent = (player.xp / req_xp) *100;
 
+  PGresult* level_pos = SQL_query(conn, "select row_idx \
+        from (select dense_rank() over (order by p_level desc) as row_idx, user_id from public.player) \
+        as lb where lb.user_id = %ld",
+        user->id);
+
   embed->fields->array[INFO_GENERAL].name = format_str(SIZEOF_TITLE, "General Stats");
   embed->fields->array[INFO_GENERAL].value = format_str(SIZEOF_FIELD_VALUE,
       " "INDENT" "ENERGY" Energy: **%d**/%d \n"
-      " "INDENT" "STAHR" Level: **%d** **(**%0.1f%%**)** \n"
+      " "INDENT" "STAHR" Level: **%d** **(**%0.1f%%**)** **#%d** \n"
       " "INDENT" "ACORNS" Acorns: **%s** \n"
       " "INDENT" "GOLDEN_ACORNS" Golden Acorns: **%s** \n"
       " "INDENT" "SEEDS" Seeds: **%s** \n"
       " "INDENT" "PINE_CONES" Pine Cones: **%s** \n"
       " "INDENT" "ACORN_COUNT" Acorn Count: **%s** \n",
       player.energy, MAX_ENERGY,
-      player.level, percent, num_str(player.acorns), 
+      player.level, percent, strtoint(PQgetvalue(level_pos, 0, 0)), num_str(player.acorns), 
       num_str(player.golden_acorns), num_str(player.materials.seeds), num_str(player.materials.pine_cones),
       num_str(player.acorn_count) );
+  
+  PQclear(level_pos);
 
   struct tm *info = get_UTC();
 
