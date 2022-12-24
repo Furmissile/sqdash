@@ -79,11 +79,13 @@ void steal_acorns(
   // what gets put into formula
   int offset = (delta_lv >= 0) ? 1 : abs(delta_lv);
 
-  float chance = 1.0/(offset +1.0);
+  float chance = 1.0/(offset +3.0);
 
-  int stolen_acorns = steal_info->t_acorns * chance;
+  float random_percent = (float)genrand(chance*100, 25)/100;
 
-  // TODO: display mention if user is in guild, otherwise, display username
+  // int stolen_acorns = steal_info->t_acorns * chance;
+  int stolen_acorns = steal_info->t_acorns * random_percent;
+
   if (rand() % MAX_CHANCE > chance *100)
   {
     embed->color = (int)ACTION_FAILED;
@@ -92,11 +94,11 @@ void steal_acorns(
     discord_msg->content = format_str(SIZEOF_DESCRIPTION, "**%s**, someone failed to snatch your acorns!", steal_info->username);
 
     embed->description = format_str(SIZEOF_DESCRIPTION, 
-        "<@!%ld> failed to steal **%s** "ACORNS" acorns! \n", 
+        "<@%ld> failed to steal **%s** "ACORNS" acorns! \n", 
         player.user_id, num_str(stolen_acorns));
   }
   else {
-    SQL_query("update public.player set acorns = %d where user_id = %ld", 
+    SQL_query(conn, "update public.player set acorns = %d where user_id = %ld", 
         steal_info->t_acorns - stolen_acorns, steal_info->t_user_id);
     
     int golden_acorns = (chance *100 < 25) ? genrand(25, 15)
@@ -174,14 +176,14 @@ int steal_interaction(
 
   // select all players that isnt the player, owner, or isnt in same scurry
   PGresult* t_user = (player.scurry_id > 0) ?
-      SQL_query("select user_id, p_level, acorns from public.player \
-          where user_id != %ld and user_id != %ld and acorns > %d *250 and scurry_id != %ld and acorns > 0 \
+      SQL_query(conn, "select user_id, p_level, acorns from public.player \
+          where user_id != %ld and user_id != %ld and acorns > %d and scurry_id != %ld and acorns > 0 \
           order by random() LIMIT 1", 
-          event->member->user->id, OWNER_ID, player.level, player.scurry_id)
-      : SQL_query("select user_id, p_level, acorns from public.player \
-          where user_id != %ld and user_id != %ld and acorns > %d *150 \
+          event->member->user->id, OWNER_ID, STEAL_MINIMUM, player.scurry_id)
+      : SQL_query(conn, "select user_id, p_level, acorns from public.player \
+          where user_id != %ld and user_id != %ld and acorns > %d \
           order by random() LIMIT 1", 
-          event->member->user->id, OWNER_ID, player.level);
+          event->member->user->id, OWNER_ID, STEAL_MINIMUM );
 
   ERROR_DATABASE_RET((PQntuples(t_user) == 0), "No target users are available right now!", t_user);
 
