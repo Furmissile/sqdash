@@ -19,55 +19,48 @@ enum STORE_ITEMS {
   BUNNY_STORE_SIZE
 };
 
-// widely used arrays only in the scope of this file
-int quantity_array[5] = {ACORN_QUANTITY, MATERIAL_QUANTITY, GOLDEN_ACORN_QUANTITY, BIOME_MATERIAL_QUANTITY, ENERGY_QUANTITY};
-int item_index_values[5] = {ITEM_ACORNS, ITEM_MATERIALS, ITEM_GOLDEN_ACORN, 0, ITEM_ENERGY};
-
 struct discord_component bunny_purchase(
   const struct discord_interaction *event, 
   struct discord_component current_button,
   int current_item,
-  int* item_type)
+  int* item_type,
+  struct Store *bunny_store)
 {
-  int bunny_price = CATNIP_UNIT_COST * (current_item +1);
-
   int *material_ptr = biomes[player.biome].material_ptr;
 
   //if there's a custom id, this is a response
   if (event->data->custom_id
     && event->data->custom_id[1] -48 == current_item
-    && player.catnip > bunny_price)
+    && player.catnip > bunny_store[current_item].cost)
   {
-    player.catnip -= bunny_price;
+    player.catnip -= bunny_store[current_item].cost;
+
+    int quantity = bunny_store[current_item].quantity;
+
+    *item_type = current_item;
 
     switch (current_item) {
       case BUNNY_ACORNS:
-        player.acorns += ACORN_QUANTITY;
-        *item_type = ITEM_ACORNS;
+        player.acorns += quantity;
         break;
       case BUNNY_MATERIAL:
-        player.materials.seeds += MATERIAL_QUANTITY;
-        player.materials.pine_cones += MATERIAL_QUANTITY;
-        *item_type = ITEM_MATERIALS;
+        player.materials.seeds += quantity;
+        player.materials.pine_cones += quantity;
         break;
       case BUNNY_GOLDEN_ACORNS:
-        player.golden_acorns += GOLDEN_ACORN_QUANTITY;
-        *item_type = ITEM_GOLDEN_ACORN;
+        player.golden_acorns += quantity;
         break;
       case BUNNY_BIOME_MATERIAL:
-        *material_ptr += BIOME_MATERIAL_QUANTITY;
-        *item_type = player.biome;
+        *material_ptr += quantity;
         break;
       case BUNNY_ENERGY:
-        player.energy += ENERGY_QUANTITY;
-        *item_type = ITEM_ENERGY;
+        player.energy += quantity;
         break;
     }
-
   }
 
   //build the button regardless to account for updated price
-  if (player.catnip >= bunny_price )
+  if (player.catnip >= bunny_store[current_item].cost )
   {
     current_button.style = DISCORD_BUTTON_PRIMARY;
   } 
@@ -82,7 +75,8 @@ struct discord_component bunny_purchase(
 struct discord_components* build_bunny_buttons(
   const struct discord_interaction *event,
   int button_size,
-  int* item_type)
+  int* item_type,
+  struct Store *bunny_store)
 {
   struct discord_components *buttons = calloc(1, sizeof(struct discord_components));
 
@@ -91,11 +85,11 @@ struct discord_components* build_bunny_buttons(
 
   for (int i = 0; i < buttons->size; i++)
   {
-    buttons->array[i] = bunny_purchase(event, buttons->array[i], i, item_type);
+    buttons->array[i] = bunny_purchase(event, buttons->array[i], i, item_type, bunny_store);
 
     struct discord_emoji *emoji = calloc(1, sizeof(struct discord_emoji));
 
-    struct File *item_index = (i == BUNNY_BIOME_MATERIAL) ? &(biomes[player.biome].biome_material) : &(items[item_index_values[i]]);
+    struct File *item_index = bunny_store[i].item;
 
     emoji->name = item_index->emoji_name;
     emoji->id = item_index->emoji_id;
@@ -123,10 +117,12 @@ void bunny_shop(
   struct discord_embed *embed = discord_msg->embed;
   embed->color = player.color;
 
-  int item_type = 0;
-  discord_msg->buttons = build_bunny_buttons(event, 5, &item_type);
+  CREATE_BUNNY_STORE;
 
-  embed->title = format_str(SIZEOF_TITLE, "Seedy Market");
+  int item_type = 0;
+  discord_msg->buttons = build_bunny_buttons(event, 5, &item_type, bunny_store);
+
+  embed->title = format_str(SIZEOF_TITLE, "Bunny's Endeavor");
 
   embed->description = format_str(SIZEOF_DESCRIPTION,
       ""OFF_ARROW" Purchase an item with *Catnip* "CATNIP". \n"
@@ -157,22 +153,22 @@ void bunny_shop(
   {
     int file_index = i - BUNNY_SIZE;
 
-    struct File *item_index = (file_index == BUNNY_BIOME_MATERIAL) ? &(biomes[player.biome].biome_material) : &(items[item_index_values[file_index]]);
-
+    struct File *item_index = bunny_store[file_index].item;
+    
     embed->fields->array[i].name = format_str(SIZEOF_TITLE, "%s <:%s:%ld> %s", 
-        num_str(quantity_array[file_index]), item_index->emoji_name, item_index->emoji_id, item_index->formal_name);
+        num_str(bunny_store[file_index].quantity), item_index->emoji_name, item_index->emoji_id, item_index->formal_name);
     
     embed->fields->array[i].value = format_str(SIZEOF_FIELD_VALUE,
         " "INDENT" *Requires* **%s** "CATNIP" Catnip \n",
-        num_str(CATNIP_UNIT_COST * (file_index +1)));
+        num_str(bunny_store[file_index].cost) );
   }
 
   embed->thumbnail = discord_set_embed_thumbnail(fill_git_url(BUNNY_ED_PATH) );
 
   embed->footer = (event->data->custom_id) ? discord_set_embed_footer(
     format_str(SIZEOF_FOOTER_TEXT, "You received %s %s!",
-        num_str(quantity_array[event->data->custom_id[1] -48]), items[item_type].formal_name),
-    fill_git_url(items[item_type].file_path) 
+        num_str(bunny_store[item_type].quantity), bunny_store[item_type].item->formal_name),
+    fill_git_url(bunny_store[item_type].item->file_path) 
   ) 
   : discord_set_embed_footer(
     format_str(SIZEOF_FOOTER_TEXT, "/help | Details on how catnip works!"),

@@ -93,6 +93,8 @@ struct Player {
   int color;
 
   time_t main_cd;
+  time_t daily_cd;
+  int daily_streak;
   int energy;
 
   unsigned long scurry_id;
@@ -121,6 +123,12 @@ struct Rewards {
 
   int golden_acorns;
   int catnip;
+};
+
+struct Store {
+  struct File *item;
+  int cost;
+  int quantity;
 };
 
 struct Message {
