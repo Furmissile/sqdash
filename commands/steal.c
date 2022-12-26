@@ -79,11 +79,10 @@ void steal_acorns(
   // what gets put into formula
   int offset = (delta_lv >= 0) ? 1 : abs(delta_lv);
 
-  float chance = 1.0/(offset +3.0);
+  float chance = 1.0/(offset +2.0);
 
   float random_percent = (float)genrand(chance*100, 25)/100;
 
-  // int stolen_acorns = steal_info->t_acorns * chance;
   int stolen_acorns = steal_info->t_acorns * random_percent;
 
   if (rand() % MAX_CHANCE > chance *100)
@@ -106,7 +105,7 @@ void steal_acorns(
         : genrand(75, 25);
 
     player.acorns += stolen_acorns;
-    player.acorn_count += stolen_acorns;
+    player.acorn_count += (STEAL_MINIMUM + (stolen_acorns * 0.1));
     player.golden_acorns += golden_acorns;
 
     embed->color = (int)ACTION_SUCCESS;
@@ -131,7 +130,7 @@ void steal_from_user(struct discord *client, struct discord_response *resp, cons
   struct Steal_Info *steal_info = resp->data;
   const struct discord_interaction *event = resp->keep;
 
-  steal_info->username = format_str(SIZEOF_TITLE, "**%s**", user->username);
+  steal_info->username = format_str(SIZEOF_TITLE, "`%s`", user->username);
 
   steal_acorns(client, event, steal_info);
 }
