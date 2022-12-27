@@ -112,7 +112,7 @@ int generate_price(int stat_lv, int unit_price, float mult_factor)
 
 int factor_biome(int player_lv)
 {
-  int player_biome = (player_lv -20)/10;
+  int player_biome = (player_lv -20)/10 +1;
 
   return (player_lv < 20) ? 0 : (player_biome >= BIOME_SIZE -1) ? BIOME_SIZE -1 : player_biome;
 }

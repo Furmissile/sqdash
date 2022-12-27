@@ -41,7 +41,10 @@ int color_interaction(
 
   char* input = event->data->options->array[0].value;
 
-  ERROR_INTERACTION((player.acorns < COLOR_COST), "This action requires %d acorns. You need %d more acorns!", COLOR_COST, COLOR_COST - player.acorns);
+  ERROR_INTERACTION((player.acorns < COLOR_COST), 
+      format_str(SIZEOF_DESCRIPTION, 
+          "This action requires %d acorns. You need %d more acorns!", 
+          COLOR_COST, COLOR_COST - player.acorns) );
   ERROR_INTERACTION( ( !is_color(client, event, lowercase(input)) ), "Invalid input. Please try again!");
 
   msg->embed->title = format_str(SIZEOF_TITLE, "Color successfully changed!");

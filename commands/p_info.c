@@ -144,6 +144,9 @@ void p_info(struct discord *client, struct discord_response *resp, const struct 
 
   struct discord_embed *embed = discord_msg->embed;
 
+  player = load_player_struct(user->id);
+  scurry = load_scurry_struct(player.scurry_id);
+
   energy_regen();
 
   //Load Author
@@ -164,10 +167,19 @@ void p_info(struct discord *client, struct discord_response *resp, const struct 
   float req_xp = req_xp(player.level);
   float percent = (player.xp / req_xp) *100;
 
-  PGresult* level_pos = SQL_query(conn, "select row_idx \
-        from (select dense_rank() over (order by p_level desc) as row_idx, user_id from public.player) \
-        as lb where lb.user_id = %ld",
-        user->id);
+  #ifdef BETA
+      PGresult* level_pos = SQL_query(conn, "select row_idx \
+          from (select dense_rank() over (order by p_level desc) as row_idx, user_id \
+          from public.player) as lb \
+          where user_id = %ld",
+          OWNER_ID, user->id);
+  #else
+      PGresult* level_pos = SQL_query(conn, "select row_idx \
+          from (select dense_rank() over (order by p_level desc) as row_idx, user_id \
+          from public.player where user_id != %ld) as lb \
+          where user_id = %ld",
+          user->id);
+  #endif
 
   embed->fields->array[INFO_GENERAL].name = format_str(SIZEOF_TITLE, "General Stats");
   embed->fields->array[INFO_GENERAL].value = format_str(SIZEOF_FIELD_VALUE,
@@ -254,22 +266,25 @@ int info_interaction(
   const struct discord_interaction *event, 
   struct Message *msg) 
 {
-  unsigned long user_id = (event->data->options) ? strtobigint(trim_user_id(event->data->options->array[0].value)) : event->member->user->id;
-
-  PGresult* search_player = SQL_query(conn, "select * from public.player where user_id = %ld", user_id);
-
-  ERROR_DATABASE_RET((PQntuples(search_player) == 0), "This player does not exist!", search_player);
-  PQclear(search_player);
-
-  player = load_player_struct(user_id);
-  scurry = load_scurry_struct(player.scurry_id);
-
   struct discord_ret_user ret_user = {
     .done = &p_info,
     .fail = &info_error,
     .data = msg,
     .keep = event
   };
+
+  unsigned long user_id;
+  if (event->data->options) {
+    user_id = strtobigint(trim_user_id(event->data->options->array[0].value));
+
+    PGresult* search_player = SQL_query(conn, "select * from public.player where user_id = %ld", user_id);
+
+    ERROR_DATABASE_RET((PQntuples(search_player) == 0), "This player does not exist!", search_player);
+    PQclear(search_player);
+  }
+  else {
+    user_id = event->member->user->id;
+  }
 
   discord_get_user(client, user_id, &ret_user);
 
