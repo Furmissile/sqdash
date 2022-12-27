@@ -126,7 +126,8 @@ void bunny_shop(
 
   embed->description = format_str(SIZEOF_DESCRIPTION,
       ""OFF_ARROW" Purchase an item with *Catnip* "CATNIP". \n"
-      ""OFF_ARROW" The biome material sold is based on the biome you're currently in!");
+      ""OFF_ARROW" The biome material sold is based on the biome you're currently in! \n"
+      ""OFF_ARROW" Purchases scale with level!");
 
   embed->fields = calloc(1, sizeof(struct discord_embed_fields));
   embed->fields->size = BUNNY_SIZE +5;
@@ -156,7 +157,8 @@ void bunny_shop(
     struct File *item_index = bunny_store[file_index].item;
     
     embed->fields->array[i].name = format_str(SIZEOF_TITLE, "%s <:%s:%ld> %s", 
-        num_str(bunny_store[file_index].quantity), item_index->emoji_name, item_index->emoji_id, item_index->formal_name);
+        num_str(bunny_store[file_index].quantity), 
+        item_index->emoji_name, item_index->emoji_id, item_index->formal_name);
     
     embed->fields->array[i].value = format_str(SIZEOF_FIELD_VALUE,
         " "INDENT" *Requires* **%s** "CATNIP" Catnip \n",

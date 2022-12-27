@@ -95,18 +95,7 @@
 
 #define MAX_MATERIAL_CHANCE 60 //highest chance to get a biome material
 
-
-// Bunny's Endeavor
-#define CATNIP_UNIT_COST 200
-
-#define ACORN_QUANTITY 5000
-#define MATERIAL_QUANTITY 15
-#define GOLDEN_ACORN_QUANTITY 200
-#define BIOME_MATERIAL_QUANTITY 5
-#define ENERGY_QUANTITY 20
-
-// #define DAILY_COOLDOWN 86400
-#define DAILY_COOLDOWN 5
+#define DAILY_COOLDOWN 86400
 
 /* @@@ INTERACTION TYPES  @@@ */
 #define TYPE_MAIN_MSG 'r'
@@ -119,7 +108,6 @@
 #define TYPE_E_ACORN 'a'
 #define TYPE_INVITE 'i'
 #define TYPE_SCURRY_WAR 'x'
-#define TYPE_DAILY 'n'
 
 
 /* @@@ EMBED BUFFER SIZES @@@ */
@@ -152,9 +140,6 @@
 #define BIOME_MATERIAL_BUFF_COST 5
 
 #define COLOR_COST 1500
-
-// seedy market purchase value
-#define BASE_SEEDY_PURCHASE 200
 
 // MATERIAL_FACTOR is multiplied into button index of material
 #define MATERIAL_FACTOR ( 3 + genrand(0, 5) )
@@ -279,51 +264,3 @@ XP_MULTIPLIER
 #define STOLEN_ACORNS "<:stolen_acorn:1055143210839720067>"
 
 #define ACORN_COUNT "<:passive_acorns:1050407923823677502>"
-
-
-// Macro'd store structs
-// the following macros were not made global due to variable values (such as player.biome)
-#define CREATE_BUNNY_STORE \
-  struct Store *bunny_store = (struct Store[]) \
-  { \
-    { \
-      .item = &items[ITEM_ACORNS], \
-      .quantity = ACORN_QUANTITY, \
-      .cost = 200 \
-    }, \
-    { \
-      .item = &items[ITEM_MATERIALS], \
-      .quantity = MATERIAL_QUANTITY, \
-      .cost = 400 \
-    }, \
-    { \
-      .item = &items[ITEM_GOLDEN_ACORN], \
-      .quantity = GOLDEN_ACORN_QUANTITY, \
-      .cost = 600 \
-    }, \
-    { \
-      .item = &biomes[player.biome].biome_material, \
-      .quantity = BIOME_MATERIAL_QUANTITY, \
-      .cost = 800 \
-    }, \
-    { \
-      .item = &items[ITEM_ENERGY], \
-      .quantity = ENERGY_QUANTITY, \
-      .cost = 1000 \
-    } \
-  }
-
-#define CREATE_SEEDY_STORE \
-  struct Store *seedy_store = (struct Store[]) \
-  { \
-    { \
-      .item = &biomes[GRASSLANDS].biome_material, \
-      .quantity = 5, \
-      .cost = 200 \
-    }, \
-    { \
-      .item = &biomes[SEEPING_SANDS].biome_material, \
-      .quantity = 5, \
-      .cost = 400 \
-    } \
-  }
