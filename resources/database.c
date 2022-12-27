@@ -28,12 +28,12 @@ struct Player load_player_struct(unsigned long user_id)
   if (PQntuples(search_player) == 0)
   {
     SQL_query(conn, "BEGIN; \
-      insert into public.player values(%ld, 1, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0); \
+      insert into public.player values(%ld, 1, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, %ld); \
       insert into public.materials values(%ld, 0, 0, 0, 0, 0, 0, 0); \
       insert into public.stats values(%ld, 1, 1, 1, 1, 1); \
       insert into public.buffs values(%ld, 0, 0, 0, 0, 0); \
       COMMIT;", 
-      user_id, user_id, user_id, user_id);
+      user_id, time(NULL), user_id, user_id, user_id);
   }
 
   PQclear(search_player);
@@ -64,6 +64,7 @@ struct Player load_player_struct(unsigned long user_id)
     .stolen_acorns = strtoint( PQgetvalue(search_player, 0, DB_STOLEN_ACORNS) ),
     .acorn_count = strtoint( PQgetvalue(search_player, 0, DB_ACORN_COUNT) ),
     .catnip = strtoint( PQgetvalue(search_player, 0, DB_CATNIP) ),
+    .daily_cd = strtobigint( PQgetvalue(search_player, 0, DB_DAILY_CD) ),
 
     .materials = {
       .pine_cones = strtoint( PQgetvalue(search_player, 0, DB_PINE_CONES) ),
@@ -175,11 +176,13 @@ void update_player_row(unsigned long user_id, struct Player player_res)
       scurry_id = %ld, \
       stolen_acorns = %d, \
       acorn_count = %d, \
-      catnip = %d \
+      catnip = %d, \
+      daily_cd = %ld \
     where user_id = %ld;",
       player_res.level, player_res.xp, player_res.acorns, player_res.biome, player_res.select_encounter,
       player_res.color, player_res.main_cd, player_res.energy, player_res.golden_acorns, player_res.scurry_id,
-      player_res.stolen_acorns,player_res.acorn_count, player_res.catnip, user_id);
+      player_res.stolen_acorns,player_res.acorn_count, player_res.catnip, player_res.daily_cd,
+      user_id);
   
   ADD_TO_BUFFER(sql_str, SIZEOF_SQL_COMMAND,
     "update public.materials set \

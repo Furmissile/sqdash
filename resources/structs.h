@@ -94,7 +94,6 @@ struct Player {
 
   time_t main_cd;
   time_t daily_cd;
-  int daily_streak;
   int energy;
 
   unsigned long scurry_id;
