@@ -16,7 +16,7 @@ int scurry_create(
   ERROR_INTERACTION((player.acorns < SCURRY_CREATION_COST), 
       "You need more acorns to create a scurry!");
   
-  ERROR_INTERACTION((player.level < 20), 
+  ERROR_INTERACTION((player.level < SCURRY_LV_REQ), 
       "You must be level 20 before you can create a scurry!");
 
   char* input = event->data->options->array[0].value;

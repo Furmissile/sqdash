@@ -55,6 +55,7 @@
 #define SCURRY_MEMBER_REQ 5 // requirement to participate in wars
 
 #define SCURRY_CREATION_COST 50000 //50,000
+#define SCURRY_LV_REQ 20
 
 // RANK REQUIREMENTS
 #define SEED_NOT_MAX 5000

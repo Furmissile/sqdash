@@ -12,6 +12,7 @@ enum P_TOPIC {
   TOPIC_PROGRESSION,
   TOPIC_CHANGE_COLOR,
   TOPIC_STEAL,
+  TOPIC_SCURRY,
   TOPIC_HELP,
   TOPIC_SIZE
 };
@@ -55,10 +56,16 @@ void p_help(struct Message *discord_msg)
       " "OFF_ARROW" The color of your embed can be changed by inputing a hex value into `/color`. \n"
       " "OFF_ARROW" Looking for a hex color? Check out this [**link**](https://htmlcolorcodes.com/color-picker/) for reference!");
 
+  embed->fields->array[TOPIC_SCURRY].name = format_str(SIZEOF_TITLE, ""ACORNS" Scurries");
+  embed->fields->array[TOPIC_SCURRY].value = format_str(SIZEOF_FIELD_VALUE,
+      " "OFF_ARROW" Scurries can be created at level **%d** and with **%s** acorns. A player can not own more than 1 scurry. \n"
+      " "OFF_ARROW" For more info on scurries, send `/scurry_info`!",
+      SCURRY_LV_REQ, num_str(SCURRY_CREATION_COST));
+
   embed->fields->array[TOPIC_STEAL].name = format_str(SIZEOF_TITLE, ""ACORNS" Stealing Player Acorns");
   embed->fields->array[TOPIC_STEAL].value = format_str(SIZEOF_FIELD_VALUE,
       " "OFF_ARROW" Stealing from other players gives acorns and golden acorns "GOLDEN_ACORNS". \n"
-      " "OFF_ARROW" Golden acorns can be spent on materials from the **Seedy Market**. Check it out using `/seedy_market`! \n");
+      " "OFF_ARROW" Golden acorns can be spent on materials from the **Seedy Market**. Check it out using `/seedy_market`!");
 
   embed->fields->array[TOPIC_HELP].name = format_str(SIZEOF_TITLE, ""ACORNS" Reporting Issues");
   embed->fields->array[TOPIC_HELP].value = format_str(SIZEOF_FIELD_VALUE, 
