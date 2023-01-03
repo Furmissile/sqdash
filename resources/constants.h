@@ -129,6 +129,7 @@
 
 /* @@@ STAT CONSTANTS @@@ */
 #define STAT_EVOLUTION 5
+#define PLAYER_EVOLUTION 10
 
 //Unit per upgrade values
 #define UNIT_ACORN 1000

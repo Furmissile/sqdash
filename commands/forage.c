@@ -103,7 +103,8 @@ void get_rewards(int item_type, char msg_id)
     rewards.acorns *= 2;
   }
 
-  rewards.acorns *= 1 + (0.2 * (player.level/20));
+  rewards.acorns *= 1 + (0.2 * (player.level/PLAYER_EVOLUTION));
+  rewards.xp *= 1 + (0.2 * (player.level/PLAYER_EVOLUTION));
 
   factor_stats();
 
