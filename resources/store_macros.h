@@ -62,18 +62,18 @@
     }, \
     { \
       .item = &items[ITEM_MATERIALS], \
-      .quantity = (((player.level/STAT_EVOLUTION) +1) * 10), \
+      .quantity = (player.level/STAT_EVOLUTION +1) * 5, \
     }, \
     { \
       .item = &items[ITEM_GOLDEN_ACORN], \
-      .quantity = ((player.level/STAT_EVOLUTION) +1) * 25, \
+      .quantity = (player.level/STAT_EVOLUTION +1) * 50, \
     }, \
     { \
-      .item = &biomes[rand() % player.max_biome].biome_material, \
+      .item = &biomes[rand() % (player.max_biome +1)].biome_material, \
       .quantity = player.level/STAT_EVOLUTION +1, \
     }, \
     { \
       .item = &items[ITEM_ENERGY], \
-      .quantity = ((player.level/STAT_EVOLUTION) +1) * 15, \
+      .quantity = (player.level/STAT_EVOLUTION +1) * 10, \
     } \
   }
