@@ -93,8 +93,8 @@ void give_daily(
 
     struct File *selected_item = daily_rewards[daily_type].item;
     
-    int quantity = daily_rewards[daily_type].quantity * (float)genrand(chance*100, 25)/100;
-
+    int quantity = daily_rewards[daily_type].quantity * (float)genrand(100, 130)/100;
+  
     ADD_TO_BUFFER(update_message, SIZEOF_DESCRIPTION, 
         "<@%ld> received **%s** <:%s:%ld> %s \n", 
         event->member->user->id, num_str(quantity), selected_item->emoji_name, 
@@ -129,7 +129,7 @@ void give_daily(
     .type = DISCORD_INTERACTION_CHANNEL_MESSAGE_WITH_SOURCE,
 
     .data = &(struct discord_interaction_callback_data) { 
-      .flags = (time(NULL) < player.daily_cd) ? DISCORD_MESSAGE_EPHEMERAL : 0,
+      .flags = (time(NULL) > player.daily_cd) ? DISCORD_MESSAGE_EPHEMERAL : 0,
       .content = format_str(SIZEOF_DESCRIPTION, update_message) 
     }
   },
