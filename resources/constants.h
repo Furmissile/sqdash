@@ -133,18 +133,10 @@
 
 //Unit per upgrade values
 #define UNIT_ACORN 1000
-#define UNIT_PINE_CONE 5
-#define UNIT_BIOME_MATERIAL 1
 
-//Fixed enchanted acorn costs
-#define ACORN_BUFF_COST 2500
-#define SEEDS_BUFF_COST 25
-#define BIOME_MATERIAL_BUFF_COST 5
+#define GOLDEN_ACORN_BUFF_COST 1000
 
 #define COLOR_COST 1500
-
-// MATERIAL_FACTOR is multiplied into button index of material
-#define MATERIAL_FACTOR ( 3 + genrand(0, 5) )
 
 /* Price multiplier factors */
 #define ACORN_MULT_FACTOR 1           // smell (GL)

@@ -4,6 +4,8 @@
 
   - Displays the player's balance and details about each stat
   - Details include level, cost to upgrade, and total value
+
+  TODO: Allow all stats to show (make stat_ptr a part of struct File)
 */
 
 /* Handles upgrading a stat */
@@ -13,28 +15,19 @@ struct discord_component upgrade_stat(
   int current_stat)
 {
   int* stat_lv_ptr = biomes[current_stat].stat_ptr;
-  int* material_ptr = biomes[current_stat].material_ptr;
 
   //if there's a custom id, this is a response
   if (event->data->custom_id
     && event->data->custom_id[1] -48 == current_stat // compares button index at [1] to button index of button pressed
-    && player.acorns >= generate_price(*stat_lv_ptr, UNIT_ACORN, biomes[current_stat].stat_price_multiplier)
-    && player.materials.pine_cones >= generate_price(*stat_lv_ptr, UNIT_PINE_CONE, biomes[current_stat].stat_price_multiplier)
-    && *material_ptr >= generate_price(*stat_lv_ptr, UNIT_BIOME_MATERIAL, biomes[current_stat].stat_price_multiplier) )
+    && player.acorns >= generate_price(*stat_lv_ptr, UNIT_ACORN, biomes[current_stat].stat_price_multiplier) )
   {
     player.acorns -= generate_price(*stat_lv_ptr, UNIT_ACORN, biomes[current_stat].stat_price_multiplier);
-
-    player.materials.pine_cones -= generate_price(*stat_lv_ptr, UNIT_PINE_CONE, biomes[current_stat].stat_price_multiplier);
-
-    *material_ptr -= generate_price(*stat_lv_ptr, UNIT_BIOME_MATERIAL, biomes[current_stat].stat_price_multiplier);
 
     (*stat_lv_ptr)++;
   }
 
   //build the button regardless to account for updated price
-  if (player.acorns >= generate_price(*stat_lv_ptr, UNIT_ACORN, biomes[current_stat].stat_price_multiplier)
-    && player.materials.pine_cones >= generate_price(*stat_lv_ptr, UNIT_PINE_CONE, biomes[current_stat].stat_price_multiplier)
-    && *material_ptr >= generate_price(*stat_lv_ptr, UNIT_BIOME_MATERIAL, biomes[current_stat].stat_price_multiplier) )
+  if (player.acorns >= generate_price(*stat_lv_ptr, UNIT_ACORN, biomes[current_stat].stat_price_multiplier) )
   {
     current_button.style = DISCORD_BUTTON_PRIMARY;
   } 
@@ -61,7 +54,7 @@ struct discord_components* build_upgrade_buttons(
 
     int is_evolution = ((*biomes[i].stat_ptr +1) % STAT_EVOLUTION == 0) ? 1 : 0;
 
-    buttons->array[i].label = (is_evolution) ? "EVOLVE!" : "Upgrade";
+    buttons->array[i].label = (is_evolution) ? "EVOLVE!" : stat_files[i].formal_name;
 
     struct discord_emoji *emoji = calloc(1, sizeof(struct discord_emoji));
 
@@ -87,8 +80,7 @@ struct discord_components* build_upgrade_buttons(
 
 enum STORE_FORMAT {
   STORE_GENERAL = 0,
-  STORE_BIOMES = 1,
-  STORE_SIZE = 2,
+  STORE_SIZE = 1,
 };
 
 void player_shop(
@@ -112,26 +104,7 @@ void player_shop(
 
   /* Fill in player balance */
   embed->fields->array[STORE_GENERAL].name = format_str(SIZEOF_TITLE, "Balance");
-  embed->fields->array[STORE_GENERAL].value = format_str(SIZEOF_FIELD_VALUE,
-      "> "ACORNS" Acorns: **%s** \n"
-      "> "PINE_CONES" Pine Cones: **%s** \n\n",
-      num_str(player.acorns), num_str(player.materials.pine_cones) );
-
-  /* Fill in player materials (after button interactions) */
-  char store_biome_field[SIZEOF_FIELD_VALUE] = {};
-  for (int i = 0; i < player.max_biome +1; i++)
-  {
-    int* material_ptr = biomes[i].material_ptr;
-    struct File biome_material = biomes[i].biome_material;
-
-    ADD_TO_BUFFER(store_biome_field, SIZEOF_DESCRIPTION,
-        "> <:%s:%ld> %s: **%s** \n",
-        biome_material.emoji_name, biome_material.emoji_id, 
-        biome_material.formal_name, num_str(*material_ptr) );
-  }
-
-  embed->fields->array[STORE_BIOMES].name = format_str(SIZEOF_TITLE, "Biome Materials");
-  embed->fields->array[STORE_BIOMES].value = format_str(SIZEOF_FIELD_VALUE, store_biome_field);
+  embed->fields->array[STORE_GENERAL].value = format_str(SIZEOF_FIELD_VALUE, "> "ACORNS" Acorns: **%s** \n", num_str(player.acorns) );
 
   /* Fill in upgade information in separate fields */
   for (int i = STORE_SIZE; i < STORE_SIZE + player.max_biome +1; i++)
@@ -141,29 +114,20 @@ void player_shop(
     char* stahr_type = (*biomes[biome_index].stat_ptr < BRONZE_BRACKET) ? BRONZE_STAHR
       : (*biomes[biome_index].stat_ptr < SILVER_BRACKET) ? SILVER_STAHR : STAHR;
 
-    struct File biome_material = biomes[biome_index].biome_material;
-
     embed->fields->array[i].name = format_str(SIZEOF_TITLE, 
         "%s (%s **%d**)", 
         stat_files[biome_index].formal_name, stahr_type, *biomes[biome_index].stat_ptr);
-    
+
     embed->fields->array[i].value = format_str(SIZEOF_FIELD_VALUE,
         (biome_index == STAT_PROFICIENCY) ? " "OFF_ARROW" %s (x**%0.2f**) \n" :
         (biome_index == STAT_SMELL) ? " "OFF_ARROW" %s (x**%0.1f**) \n"
             : " "OFF_ARROW" %s (+**%0.0f**) \n",
         stat_files[biome_index].description, 
         generate_factor(biomes[biome_index].stat_value_multiplier, *biomes[biome_index].stat_ptr) );
-    
-    char* buffer = embed->fields->array[i].value;
-    ADD_TO_BUFFER(buffer, SIZEOF_FIELD_VALUE,
-        "**Cost to Upgrade:** \n"
-        " "INDENT" **%s** "ACORNS" Acorns \n"
-        " "INDENT" **%s** "PINE_CONES" Pine Cones \n"
-        " "INDENT" **%s** <:%s:%ld> %s \n",
-        num_str( generate_price(*biomes[biome_index].stat_ptr, UNIT_ACORN, biomes[biome_index].stat_price_multiplier) ),
-        num_str( generate_price(*biomes[biome_index].stat_ptr, UNIT_PINE_CONE, biomes[biome_index].stat_price_multiplier) ),
-        num_str( generate_price(*biomes[biome_index].stat_ptr, UNIT_BIOME_MATERIAL, biomes[biome_index].stat_price_multiplier) ),
-        biome_material.emoji_name, biome_material.emoji_id, biome_material.formal_name );
+
+    ADD_TO_BUFFER(embed->fields->array[i].value, SIZEOF_FIELD_VALUE,
+        "*Costs* **%s** "ACORNS" Acorns",
+        num_str( generate_price(*biomes[biome_index].stat_ptr, UNIT_ACORN, biomes[biome_index].stat_price_multiplier) ) );
   }
 
 }

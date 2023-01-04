@@ -12,6 +12,8 @@ Mechanic:
   -> Disable all buttons
   -> Generate duration by what material was used
 
+  TODO: Allow all buffs to show (make stat_ptr a part of struct File)
+  TODO: Rename buffs to fit new game design
 */
 
 
@@ -24,32 +26,27 @@ struct discord_component select_materials(
   // if there's a custom id, this is a response
   if (event->data->custom_id
     && event->data->custom_id[1] -48 == button_index // compares button index at [1] to button index of button pressed
-    && player.acorns >= ACORN_BUFF_COST
-    && player.materials.seeds >= SEEDS_BUFF_COST
-    && *biomes[button_index].material_ptr >= BIOME_MATERIAL_BUFF_COST )
+    && player.golden_acorns >= GOLDEN_ACORN_BUFF_COST )
   {
-    player.acorns -= ACORN_BUFF_COST;
-    player.materials.seeds -= SEEDS_BUFF_COST;
-    *biomes[button_index].material_ptr -= BIOME_MATERIAL_BUFF_COST;
+    player.golden_acorns -= GOLDEN_ACORN_BUFF_COST;
 
-    //matched with Buffs enum
-    *rune_type = rand() % BUFF_SIZE;
+    *rune_type = button_index;
 
     switch (*rune_type) {
       case ACUITY_ACORN:
-        player.buffs.acuity_acorn += ((button_index +1) * (MATERIAL_FACTOR));
+        player.buffs.acuity_acorn += genrand(10, 5);
         break;
       case ENDURANCE_ACORN:
-        player.buffs.endurance_acorn += ((button_index +1) * (MATERIAL_FACTOR));
+        player.buffs.endurance_acorn += genrand(10, 5);
         break;
       case LUCK_ACORN:
-        player.buffs.luck_acorn += ((button_index +1) * (MATERIAL_FACTOR));
+        player.buffs.luck_acorn += genrand(10, 5);
         break;
       case PROFICIENCY_ACORN:
-        player.buffs.proficiency_acorn += ((button_index +1) * (MATERIAL_FACTOR));
+        player.buffs.proficiency_acorn += genrand(10, 5);
         break;
       case SMELL_ACORN:
-        player.buffs.smell_acorn += ((button_index +1) * (MATERIAL_FACTOR));
+        player.buffs.smell_acorn += genrand(10, 5);
         break;
       default:
         printf("\n\nThis buff doesnt exist! \n\n");
@@ -57,9 +54,7 @@ struct discord_component select_materials(
 
   }
 
-  if (player.acorns >= ACORN_BUFF_COST
-    && player.materials.seeds >= SEEDS_BUFF_COST
-    && *biomes[button_index].material_ptr >= BIOME_MATERIAL_BUFF_COST )
+  if (player.golden_acorns >= GOLDEN_ACORN_BUFF_COST)
   {
     current_button.style = DISCORD_BUTTON_PRIMARY;
   }
@@ -86,16 +81,15 @@ struct discord_components* build_buff_buttons(
   {
     buttons->array[i] = select_materials(event, buttons->array[i], i, rune_type);
 
-    struct File biome_material = biomes[i].biome_material;
-
     struct discord_emoji *emoji = calloc(1, sizeof(struct discord_emoji));
-    emoji->name = biome_material.emoji_name;
-    emoji->id = biome_material.emoji_id;
+    emoji->name = enchanted_acorns[i].emoji_name;
+    emoji->id = enchanted_acorns[i].emoji_id;
 
     char* set_custom_id = calloc(SIZEOF_CUSTOM_ID, sizeof(char));
     snprintf(set_custom_id, SIZEOF_CUSTOM_ID, "%c%d_%ld", TYPE_E_ACORN, i, event->member->user->id);
   
     buttons->array[i].custom_id = set_custom_id;
+    buttons->array[i].label = enchanted_acorns[i].formal_name;
     buttons->array[i].type = DISCORD_COMPONENT_BUTTON;
     buttons->array[i].emoji = emoji;
   }
@@ -105,10 +99,9 @@ struct discord_components* build_buff_buttons(
 
 enum BUFFS_FORMAT {
   BUFFS_GENERAL = 0,
-  BUFFS_MATERIALS = 1,
-  BUFFS_PRICES = 2,
-  BUFFS_SIZE = 3,
-  BUFFS_TYPES = 8
+  BUFFS_PRICES = 1,
+  BUFFS_SIZE = 2,
+  BUFFS_TYPES = BUFFS_SIZE + 5
 };
 
 void power_shop(
@@ -124,8 +117,7 @@ void power_shop(
   embed->title = format_str(SIZEOF_TITLE, "Buffs Shop");
 
   embed->description = format_str(SIZEOF_DESCRIPTION,
-    ""OFF_ARROW" Select a biome material and receive a random buff of the ones listed. \n"
-    ""OFF_ARROW" Selecting a higher biome material grants a longer duration. \n"
+    ""OFF_ARROW" Select a any buff listed to receive its benefit. \n"
     ""OFF_ARROW" Buffs are stackable, but deplete regardless of whether you receive the benefit! \n"
     ""OFF_ARROW" Active buffs show up with a "QUEST_MARKER" near it with its duration.");
 
@@ -135,31 +127,13 @@ void power_shop(
 
   embed->fields->array[BUFFS_GENERAL].name = format_str(SIZEOF_TITLE, "Balance");
   embed->fields->array[BUFFS_GENERAL].value = format_str(SIZEOF_FIELD_VALUE,
-      "\n > "ACORNS" Acorns: **%s**"
-      "\n > "SEEDS" Seeds: **%s**",
-      num_str(player.acorns), num_str(player.materials.seeds) );
-
-  // Fill in biome materials (after balance)
-  char buffs_materials_field[SIZEOF_FIELD_VALUE] = {};
-  for (int i = 0; i < player.max_biome +1; i++)
-  {
-    int* material_ptr = biomes[i].material_ptr;
-    struct File biome_material = biomes[i].biome_material;
-
-    ADD_TO_BUFFER(buffs_materials_field, SIZEOF_DESCRIPTION,
-        "> <:%s:%ld> %s: **%s** \n",
-        biome_material.emoji_name, biome_material.emoji_id, 
-        biome_material.formal_name, num_str(*material_ptr) );
-  }
-  embed->fields->array[BUFFS_MATERIALS].name = format_str(SIZEOF_TITLE, "Biome Materials");
-  embed->fields->array[BUFFS_MATERIALS].value = format_str(SIZEOF_FIELD_VALUE, buffs_materials_field);
+      "\n > "GOLDEN_ACORNS" Golden Acorns: **%s**",
+      num_str(player.golden_acorns) );
 
   embed->fields->array[BUFFS_PRICES].name = format_str(SIZEOF_TITLE, "Enchanted Acorn Cost");
-  embed->fields->array[BUFFS_PRICES].value = format_str(SIZEOF_FIELD_VALUE,
-      "> **%s** "ACORNS" Acorns \n"
-      "> **%d** "SEEDS" Seeds \n"
-      "> **%d** Any selected biome material",
-      num_str(ACORN_BUFF_COST), SEEDS_BUFF_COST, BIOME_MATERIAL_BUFF_COST);
+  embed->fields->array[BUFFS_PRICES].value = format_str(SIZEOF_FIELD_VALUE, 
+      "> **%s** "GOLDEN_ACORNS" Golden Acorns \n", 
+      num_str(GOLDEN_ACORN_BUFF_COST) );
 
   int enchanted_acorn[5] = {
     player.buffs.acuity_acorn, 

@@ -3,18 +3,14 @@
   This file will handle Bunny's Endeavor event
 
   - Acorns
-  - Golden Acorn
   - Materials
-  - Biome Materials
   - Energy
 
 */
 
 enum STORE_ITEMS {
   BUNNY_ACORNS,
-  BUNNY_MATERIAL,
   BUNNY_GOLDEN_ACORNS,
-  BUNNY_BIOME_MATERIAL,
   BUNNY_ENERGY,
   BUNNY_STORE_SIZE
 };
@@ -26,8 +22,6 @@ struct discord_component bunny_purchase(
   int* item_type,
   struct Store *bunny_store)
 {
-  int *material_ptr = biomes[player.biome].material_ptr;
-
   //if there's a custom id, this is a response
   if (event->data->custom_id
     && event->data->custom_id[1] -48 == current_item
@@ -43,15 +37,8 @@ struct discord_component bunny_purchase(
       case BUNNY_ACORNS:
         player.acorns += quantity;
         break;
-      case BUNNY_MATERIAL:
-        player.materials.seeds += quantity;
-        player.materials.pine_cones += quantity;
-        break;
       case BUNNY_GOLDEN_ACORNS:
         player.golden_acorns += quantity;
-        break;
-      case BUNNY_BIOME_MATERIAL:
-        *material_ptr += quantity;
         break;
       case BUNNY_ENERGY:
         player.energy += quantity;
@@ -120,7 +107,7 @@ void bunny_shop(
   CREATE_BUNNY_STORE;
 
   int item_type = 0;
-  discord_msg->buttons = build_bunny_buttons(event, 5, &item_type, bunny_store);
+  discord_msg->buttons = build_bunny_buttons(event, 3, &item_type, bunny_store);
 
   embed->title = format_str(SIZEOF_TITLE, "Bunny's Endeavor");
 
@@ -130,27 +117,21 @@ void bunny_shop(
       ""OFF_ARROW" Purchases scale with level!");
 
   embed->fields = calloc(1, sizeof(struct discord_embed_fields));
-  embed->fields->size = BUNNY_SIZE +5;
-  embed->fields->array = calloc(BUNNY_SIZE +5, sizeof(struct discord_embed_field));
-
-  struct File biome_material = biomes[player.biome].biome_material;
+  embed->fields->size = BUNNY_SIZE +3;
+  embed->fields->array = calloc(BUNNY_SIZE +3, sizeof(struct discord_embed_field));
 
   /* Fill in player balance */
   embed->fields->array[BUNNY_GENERAL].name = format_str(SIZEOF_TITLE, "Balance");
   embed->fields->array[BUNNY_GENERAL].value = format_str(SIZEOF_FIELD_VALUE, 
       "> "CATNIP" Catnip: **%s** \n"
       "> "ACORNS" Acorns: **%s** \n"
-      "> "PINE_CONES" Pine Cones: **%s** \n"
-      "> "SEEDS" Seeds: **%s** \n"
       "> "GOLDEN_ACORNS" Golden Acorns: **%s** \n"
-      "> <:%s:%ld> %s: **%s** \n"
       "> "ENERGY" Energy: **%s**/%d \n", 
-      num_str(player.catnip), num_str(player.acorns), num_str(player.materials.pine_cones), num_str(player.materials.seeds), num_str(player.golden_acorns),
-      biome_material.emoji_name, biome_material.emoji_id, biome_material.formal_name, num_str(*biomes[player.biome].material_ptr),
+      num_str(player.catnip), num_str(player.acorns), num_str(player.golden_acorns),
       num_str(player.energy), MAX_ENERGY );
 
   /* Fill in upgade information in separate fields */
-  for (int i = BUNNY_SIZE; i < BUNNY_SIZE +5; i++)
+  for (int i = BUNNY_SIZE; i < BUNNY_SIZE +3; i++)
   {
     int file_index = i - BUNNY_SIZE;
 
@@ -184,7 +165,6 @@ int bunny_interaction(
   struct Message *msg) 
 {
   struct tm *info = get_UTC();
-
   ERROR_INTERACTION((info->tm_mday < 21), "This event is not active!");
 
   energy_regen();
