@@ -7,6 +7,9 @@ This file handles displaying player info (no buttons exist)
   - Another segment displays stats
   - Each field represents a biome with its corresponding material
   - Has buttons for biome swapping
+
+  Changes since last push:
+    - Materials are removed
 */
 
 void create_info_interaction(
@@ -133,7 +136,6 @@ enum INFO_FORMAT {
   INFO_GENERAL,
   INFO_STATS,
   INFO_BUFFS,
-  INFO_BIOMES,
   INFO_SIZE
 };
 
@@ -165,7 +167,7 @@ void p_info(struct discord *client, struct discord_response *resp, const struct 
 
   /* Load general stats */
   float req_xp = req_xp(player.level);
-  float percent = (player.xp / req_xp) *100;
+  float percent = ((float)player.xp / req_xp) *100;
 
   #ifdef BETA
       PGresult* level_pos = SQL_query(conn, "select row_idx \
@@ -187,12 +189,10 @@ void p_info(struct discord *client, struct discord_response *resp, const struct 
       " "INDENT" "STAHR" Level: **%d** **(**%0.1f%%**)** **#%d** \n"
       " "INDENT" "ACORNS" Acorns: **%s** \n"
       " "INDENT" "GOLDEN_ACORNS" Golden Acorns: **%s** \n"
-      " "INDENT" "SEEDS" Seeds: **%s** \n"
-      " "INDENT" "PINE_CONES" Pine Cones: **%s** \n"
       " "INDENT" "ACORN_COUNT" Acorn Count: **%s** \n",
       player.energy, MAX_ENERGY,
       player.level, percent, strtoint(PQgetvalue(level_pos, 0, 0)), num_str(player.acorns), 
-      num_str(player.golden_acorns), num_str(player.materials.seeds), num_str(player.materials.pine_cones),
+      num_str(player.golden_acorns),
       num_str(player.acorn_count) );
   
   PQclear(level_pos);
@@ -230,21 +230,6 @@ void p_info(struct discord *client, struct discord_response *resp, const struct 
   /* Loads active buffs */
   embed->fields->array[INFO_BUFFS].name = format_str(SIZEOF_TITLE, "Active Buffs");
   embed->fields->array[INFO_BUFFS].value = format_str(SIZEOF_FIELD_VALUE, load_e_acorn_status() );
-  
-  /* Loads biome materials */
-  char player_biome_field[SIZEOF_FIELD_VALUE] = {};
-  for (int i = 0; i < player.max_biome +1; i++) {
-    struct File biome_icon = biomes[i].biome_icon;
-    struct File biome_material = biomes[i].biome_material;
-
-    ADD_TO_BUFFER(player_biome_field, SIZEOF_FIELD_VALUE,
-        "<:%s:%ld> **%s** <:%s:%ld> %s \n",
-        biome_icon.emoji_name, biome_icon.emoji_id, num_str(*biomes[i].material_ptr),
-        biome_material.emoji_name, biome_material.emoji_id, biome_material.formal_name );
-  }
-
-  embed->fields->array[INFO_BIOMES].name = format_str(SIZEOF_TITLE, "Biome Materials");
-  embed->fields->array[INFO_BIOMES].value = format_str(SIZEOF_FIELD_VALUE, player_biome_field);
 
   /* Loads buttons for biome swap */
   discord_msg->buttons = build_biome_buttons(event, player.max_biome +1);

@@ -7,6 +7,8 @@ This header handles the main embed and interactions associated with it
    - ENCOUNTER displays thumbnail, conflict, name, and options
    - Reward displays an updated description of what the player got
 
+  Changes since last push:
+    - Replaced materials with golden acorns
 */
 
 void factor_stats(void)
@@ -18,16 +20,6 @@ void factor_stats(void)
 
   //factor smell stat into acorns
   rewards.acorns *= generate_factor(ACORN_MULTIPLIER, player.stats.smell_lv);
-
-  /* Only materials need biome condition as stat increments reward by default */
-  if (rewards.pine_cones && player.max_biome > GRASSLANDS)
-    rewards.pine_cones += generate_factor(PINE_CONE_INC, player.stats.dexterity_lv);
-
-  if (rewards.seeds && player.max_biome > SEEPING_SANDS)
-    rewards.seeds += generate_factor(SEEDS_INC, player.stats.acuity_lv);
-
-  if (rewards.biome_material && player.max_biome > DEATH_GRIP)
-    rewards.biome_material += generate_factor(BIOME_MATERIAL_INC, player.stats.luck_lv);
 }
 
 void factor_buff(void)
@@ -41,18 +33,6 @@ void factor_buff(void)
   if (player.buffs.proficiency_acorn > 0) {
     rewards.xp *= 1.5;
     player.buffs.proficiency_acorn--;
-  }
-
-  if (rewards.biome_material && player.buffs.luck_acorn > 0) {
-    rewards.biome_material += 2;
-    player.buffs.luck_acorn--;
-  }
-
-  if (rewards.pine_cones && rewards.seeds && player.buffs.acuity_acorn > 0) {
-    rewards.pine_cones += 2;
-    rewards.seeds += 2;
-
-    player.buffs.acuity_acorn--;
   }
 
 }
@@ -77,9 +57,7 @@ void get_rewards(int item_type, char msg_id)
       rewards = (struct Rewards) {
         .xp = genrand(100, 50), 
         .acorns = genrand(75, 25), 
-        .seeds = genrand(1, 3),
-        .pine_cones = genrand(1, 3),
-        .biome_material = (rand() % MAX_CHANCE < MAX_MATERIAL_CHANCE - (player.biome * 10) ) ? 1 : 0
+        .golden_acorns = genrand(25, 25)
       };
       break;
     case TYPE_ACORN_SACK:
@@ -118,11 +96,8 @@ void get_rewards(int item_type, char msg_id)
 
   player.xp += rewards.xp;
   player.acorns += rewards.acorns;
-  player.materials.seeds += rewards.seeds;
-  player.materials.pine_cones += rewards.pine_cones;
   player.golden_acorns += rewards.golden_acorns;
   player.catnip += rewards.catnip;
-  *biomes[player.biome].material_ptr += rewards.biome_material;
 }
 
 /* Load rewards onto main embed */
@@ -145,30 +120,21 @@ void generate_rewards(
           "+**%s** "XP" XP \n"
           "+**%s** "ACORNS" Acorns \n", 
           num_str(rewards.xp), num_str(rewards.acorns) );
+
+      if (rewards.golden_acorns)
+        ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION, "\n+**%s** "GOLDEN_ACORNS" Golden Acorns \n", num_str(rewards.golden_acorns));
+
       break;
     case TYPE_LOST_STASH:
       ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION,
           "+**%s** "XP" XP \n"
           "+**%s** "ACORNS" Acorns \n"
-          "+**%s** "SEEDS" Seeds \n"
-          "+**%s** "PINE_CONES" Pine Cones \n",
-          num_str(rewards.xp), num_str(rewards.acorns), num_str(rewards.seeds), num_str(rewards.pine_cones) );
-
-      if (rewards.biome_material)
-      {
-        struct File biome_material_file = biomes[player.biome].biome_material;
-        ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION,
-            "\n+**%s** <:%s:%ld> %s \n", 
-            num_str(rewards.biome_material),
-            biome_material_file.emoji_name, biome_material_file.emoji_id, biome_material_file.formal_name);
-      }
+          "**+%s** "GOLDEN_ACORNS" Golden Acorns \n",
+          num_str(rewards.xp), num_str(rewards.acorns), num_str(rewards.golden_acorns) );
       break;
     default:
       ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION, "You received no earnings! \n");
   }
-
-  if (rewards.golden_acorns)
-    ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION, "\n+**%s** "GOLDEN_ACORNS" Golden Acorns \n", num_str(rewards.golden_acorns));
 
   if (rewards.catnip)
     ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION, "\n+**%s** "CATNIP" Catnip \n", num_str(rewards.catnip));
