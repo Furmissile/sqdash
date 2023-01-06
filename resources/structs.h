@@ -10,6 +10,10 @@ struct File {
   char* file_path;
 
   char* description;
+  int* stat_ptr; // if a file is associated with a certain stat
+
+  float value_mult; // multiplier for rewards and stat value
+  float price_mult; // multiplier for price on upgrades
 
   char* emoji_name;
   long unsigned emoji_id;
@@ -26,12 +30,6 @@ struct Encounter {
 struct Biome {
   struct File biome_icon;
   char* biome_scene_path;
-  struct File biome_material;
-
-  int* material_ptr;
-  int* stat_ptr;
-  float stat_value_multiplier; // multiplier for rewards and stat value
-  float stat_price_multiplier; // multiplier for price on upgrades
 
   struct Encounter *encounters;
   struct File *encounter_files;
@@ -61,28 +59,15 @@ struct Buffs {
 };
 
 struct Stats {
-  int smell_lv;       // Acorns
-  int dexterity_lv;   // Pine Cones
-  int acuity_lv;      // Seeds
-  int luck_lv;        // Biome Material
-  int proficiency_lv; // XP
-};
-
-struct Materials {
-  int seeds;        // used for alchemy
-  int pine_cones;   // used for stat upgrades
-
-  int mooshrums;
-  int cactus_flowers;
-  int juniper_berries;
-  int blueberries;
-  int dark_chestnuts;
+  int proficiency_lv; // Acorns and XP
+  int strength_lv;    // HP
+  int luck_lv;        // Golden Acorns
 };
 
 struct Player {
   unsigned long user_id;
   int level;
-  float xp;
+  int xp;
   int acorns; // main currency
 
   int active_squirrel;
@@ -103,7 +88,6 @@ struct Player {
   int acorn_count;
   int catnip;
 
-  struct Materials materials;
   struct Stats stats;
   struct Buffs buffs;
 };
@@ -112,10 +96,6 @@ struct Player {
 struct Rewards {
   int xp;
   int acorns;
-  int seeds;
-  int pine_cones;
-
-  int biome_material;
 
   int courage;
   int stolen_acorns;

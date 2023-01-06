@@ -8,8 +8,6 @@ This file handles displaying player info (no buttons exist)
   - Each field represents a biome with its corresponding material
   - Has buttons for biome swapping
 
-  Changes since last push:
-    - Materials are removed
 */
 
 void create_info_interaction(
@@ -77,7 +75,7 @@ struct discord_components* build_biome_buttons(
     buttons->array[i] = (struct discord_component)
     {
       .type = DISCORD_COMPONENT_BUTTON,
-      .label = biome_icon.formal_name,
+      .label = format_str(SIZEOF_DESCRIPTION, biome_icon.formal_name),
       .custom_id = set_custom_id,
       .emoji = emoji,
     };
@@ -210,18 +208,17 @@ void p_info(struct discord *client, struct discord_response *resp, const struct 
 
   /* Loads squirrel stats */
   char player_stat_field[SIZEOF_FIELD_VALUE] = {};
-  for (int i = 0; i < player.max_biome +1; i++)
+  for (int i = 0; i < STAT_SIZE; i++)
   {
-    char* stahr_type = (*biomes[i].stat_ptr < BRONZE_BRACKET) ? BRONZE_STAHR
-      : (*biomes[i].stat_ptr < SILVER_BRACKET) ? SILVER_STAHR : STAHR;
+    char* stahr_type = (*stat_files[i].stat_ptr < BRONZE_BRACKET) ? BRONZE_STAHR
+      : (*stat_files[i].stat_ptr < SILVER_BRACKET) ? SILVER_STAHR : STAHR;
 
-    float stat_value = generate_factor(biomes[i].stat_value_multiplier, *(biomes[i].stat_ptr));
+    float stat_value = generate_factor(stat_files[i].value_mult, *(stat_files[i].stat_ptr));
 
     ADD_TO_BUFFER(player_stat_field, SIZEOF_FIELD_VALUE,
-        (i == STAT_PROFICIENCY) ? ""OFF_ARROW" *%s* (Lv **%d** %s) x**%0.2f** \n" :
-        (i == STAT_SMELL) ? ""OFF_ARROW" *%s* (Lv **%d** %s) x**%0.1f** \n"
-            : ""OFF_ARROW" *%s* (Lv **%d** %s) +**%0.0f** \n",
-        stat_files[i].formal_name, *biomes[i].stat_ptr, stahr_type, stat_value );
+        (i == STAT_PROFICIENCY) ? ""OFF_ARROW" *%s* (Lv **%d** %s) x**%0.1f** \n" :
+            ""OFF_ARROW" *%s* (Lv **%d** %s) +**%0.0f** \n",
+        stat_files[i].formal_name, *stat_files[i].stat_ptr, stahr_type, stat_value );
   }
 
   embed->fields->array[INFO_STATS].name = format_str(SIZEOF_TITLE, "Squirrel Stats");

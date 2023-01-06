@@ -27,22 +27,12 @@ enum DB_TUPLE {
   DB_ACORN_COUNT,
   DB_CATNIP,
   DB_DAILY_CD,
-
-  DB_SEEDS = 17,
-  DB_PINE_CONES,
-  DB_MOOSHRUMS,
-  DB_CACTUS_FLOWERS,
-  DB_JUNIPER_BERRIES,
-  DB_BLUEBERRIES,
-  DB_DARK_CHESTNUTS,
-
-  DB_SMELL_LV = 25,
-  DB_DEXTERITY_LV,
-  DB_ACUITY_LV,
+  // skip user id
+  DB_PROFICIENCY_LV = 17,
+  DB_STRENGTH_LV,
   DB_LUCK_LV,
-  DB_PROFICIENCY_LV,
-
-  DB_SMELL_ACORN = 31,
+  // skip user id
+  DB_SMELL_ACORN = 21,
   DB_ENDURANCE_ACORN,
   DB_ACUITY_ACORN,
   DB_LUCK_ACORN,
@@ -247,7 +237,7 @@ struct File *item_types = (struct File[])
 
 /* Buffs */
 enum BUFFS {
-  ACUITY_ACORN,
+  STRENGTH_ACORN,
   ENDURANCE_ACORN,
   LUCK_ACORN,
   PROFICIENCY_ACORN,
@@ -258,10 +248,10 @@ enum BUFFS {
 struct File *enchanted_acorns = (struct File[])
 {
   {
-    .formal_name = "Acorn of Acuity",
+    .formal_name = "Acorn of Strength",
 
     .file_path = "Enchanted%20Acorns/acuity_acorn.png",
-    .description = "*+2 material earnings*",
+    .description = "*Refills some of HP*",
 
     .emoji_name = "acuity_acorn",
     .emoji_id = 1045027180549255208,
@@ -283,7 +273,7 @@ struct File *enchanted_acorns = (struct File[])
     .formal_name = "Acorn of Luck",
 
     .file_path = "Enchanted%20Acorns/luck_acorn.png",
-    .description = "*+2 biome material earnings*",
+    .description = "*50% increased golden acorn earnings*",
 
     .emoji_name = "luck_acorn",
     .emoji_id = 1045027183334264872,
@@ -317,45 +307,37 @@ struct File *enchanted_acorns = (struct File[])
 
 /* Squirrel Stats */
 enum SQUIRREL_STATS {
-  STAT_SMELL,
-  STAT_DEXTERITY,
-  STAT_ACUITY,
-  STAT_LUCK,
   STAT_PROFICIENCY,
+  STAT_STRENGTH,
+  STAT_LUCK,
   STAT_SIZE
 };
 
 struct File *stat_files = (struct File[])
 {
   {
-    .formal_name = "Smell", // GL
-    .description = "*Multiplies "ACORNS" acorn earnings*",
+    .formal_name = "Proficiency",
+    .description = "*Multiplies XP "XP" and acorn "ACORNS" earnings*",
 
-    .stat_ptr = &player.stats.smell_lv
+    .stat_ptr = &player.stats.proficiency_lv,
+    .value_mult = PROFICIENCY_VALUE,
+    .price_mult = PROFICIENCY_FACTOR
   },
   {
-    .formal_name = "Dexterity", // SP
-    .description = "*Increases "PINE_CONES" pine cone earnings*",
+    .formal_name = "Strength",
+    .description = "*Adds 50 max "HEALTH" HP*",
 
-    .stat_ptr = &player.stats.dexterity_lv
+    .stat_ptr = &player.stats.strength_lv,
+    .value_mult = STRENGTH_VALUE,
+    .price_mult = STRENGTH_FACTOR
   },
   {
-    .formal_name = "Acuity", // NE
-    .description = "*Increases "SEEDS" seed earnings*",
+    .formal_name = "Luck",
+    .description = "*Increases golden acorn "GOLDEN_ACORNS" earnings*",
 
-    .stat_ptr = &player.stats.acuity_lv
-  },
-  {
-    .formal_name = "Luck", // DG
-    .description = "*Increases biome material earnings*",
-
-    .stat_ptr = &player.stats.luck_lv
-  },
-  {
-    .formal_name = "Proficiency", // NP
-    .description = "*Multiplies "XP" XP earnings*",
-
-    .stat_ptr = &player.stats.proficiency_lv
+    .stat_ptr = &player.stats.luck_lv,
+    .value_mult = LUCK_VALUE,
+    .price_mult = LUCK_FACTOR
   }
 };
 
@@ -390,13 +372,7 @@ struct File *evo_squirrels = (struct File[])
 struct Biome *biomes = (struct Biome[])
 {
   { // GRASSLANDS
-    .biome_material = {
-      .formal_name = "Mooshrum",
-      .file_path = "GRASSLANDS%20CONTENT/Utils/mooshrum.png",
-
-      .emoji_name = "mooshrum",
-      .emoji_id = 1033828590464278559
-    },
+    .biome_scene_path = "GRASSLANDS%20CONTENT/Utils/grasslands_scene.gif",
 
     .biome_icon = {
       .formal_name = "Grasslands",
@@ -405,14 +381,6 @@ struct Biome *biomes = (struct Biome[])
       .emoji_name = "gl_icon",
       .emoji_id = 1007390631016017991
     },
-
-    .biome_scene_path = "GRASSLANDS%20CONTENT/Utils/grasslands_scene.gif",
-
-    .material_ptr = &player.materials.mooshrums,
-    .stat_ptr = &player.stats.smell_lv,
-
-    .stat_value_multiplier = ACORN_MULTIPLIER,
-    .stat_price_multiplier = ACORN_MULT_FACTOR,
 
     .encounters = (struct Encounter[]) { //encounters are listed in alphabetical order of their file name
       {
@@ -505,13 +473,7 @@ struct Biome *biomes = (struct Biome[])
   },
 
   {// SEEPING SANDS
-    .biome_material = {
-      .formal_name = "Cactus Flower",
-      .file_path = "SEEPING%20SANDS%20CONTENT/Utils/cactus_flower.png",
-
-      .emoji_name = "cacus_flowers",
-      .emoji_id = 1006181928761839617
-    },
+    .biome_scene_path = "SEEPING%20SANDS%20CONTENT/Utils/seeping_sands_scene.gif",
 
     .biome_icon = {
       .formal_name = "Seeping Sands",
@@ -520,14 +482,6 @@ struct Biome *biomes = (struct Biome[])
       .emoji_name = "sp_icon",
       .emoji_id = 1042082262566572153
     },
-
-    .biome_scene_path = "SEEPING%20SANDS%20CONTENT/Utils/seeping_sands_scene.gif",
-
-    .material_ptr = &player.materials.cactus_flowers,
-    .stat_ptr = &player.stats.dexterity_lv,
-
-    .stat_value_multiplier = PINE_CONE_INC,
-    .stat_price_multiplier = PINE_CONE_MULT_FACTOR,
 
     .encounters = (struct Encounter[]) {
       {

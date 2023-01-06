@@ -2,6 +2,8 @@
 
   This header defines constants
 
+  Changes made since last push:
+    - Altered stats
 */
 
 // switch beta on and off
@@ -138,56 +140,25 @@
 
 #define COLOR_COST 1500
 
+/*
+* Stats include:
+	i. Smell -> Multiplies acorn earnings
+	ii. Proficiency -> Multiplies XP earnings
+	iii. Luck -> Increases golden acorn findings
+	iv. Endurance -> Increase HP
+*/
+
 /* Price multiplier factors */
-#define ACORN_MULT_FACTOR 1           // smell (GL)
-#define PINE_CONE_MULT_FACTOR 2       // dexterity (SP)
-#define SEED_MULT_FACTOR 3            // acuity (NE)
-#define BIOME_MATERIAL_MULT_FACTOR 10 // luck (DG)
-#define XP_MULT_FACTOR 5              // proficiency (NP)
-
-
-// TEMP CONSTANT UNTIL ALL BIOMES ARE ADDED
-// should be updated when a new biome is added!!!
-#define MAX_BIOME_LV 30
+#define PROFICIENCY_FACTOR 2
+#define LUCK_FACTOR 5
+#define STRENGTH_FACTOR 10
 
 /* @@@ The following stats are to increase resource earning, NOT to collect them @@@*/
 
-/*
-ACORN_MULTIPLIER
-  * Pairs with Grasslands and requires mooshrums to upgrade
-  * See generate_factor() for details
-*/
-#define ACORN_MULTIPLIER 0.10f
-
-/*
-PINE_CONE_INC
-  * Used in squirrel stat upgrades
-  * Pairs with Seeping Sands and requires cactus flowers to upgrade
-  * Increments pine cone earnings by 2 every level
-*/
-#define PINE_CONE_INC 2
-
-/*
-SEEDS_INC
-  * Used in crafting potions
-  * Pairs with Nature's End and requires Juniper Berries to upgrade
-  * Increments seed earnings by 2 every level
-*/
-#define SEEDS_INC 2
-
-/*
-BIOME_MATERIAL_INC
-  * Pairs with Death's Grip and requires snowberries to upgrade
-  * Increments biome material reward by 1 every level
-*/
-#define BIOME_MATERIAL_INC 1 // Biome materials (NP)
-
-/*
-XP_MULTIPLIER
-  * Pairs with Necropolis and requires dark chestnuts to upgrade
-  * See generate_factor() for details
-*/
-#define XP_MULTIPLIER 0.05f
+// See generate_factor() for details
+#define PROFICIENCY_VALUE 0.1f
+#define LUCK_VALUE 25
+#define STRENGTH_VALUE 50
  
 // Stat level brackets (for some style)
 #define BRONZE_BRACKET 20
@@ -258,3 +229,4 @@ XP_MULTIPLIER
 #define STOLEN_ACORNS "<:stolen_acorn:1055143210839720067>"
 
 #define ACORN_COUNT "<:passive_acorns:1050407923823677502>"
+#define HEALTH "<:health:1060626677715181588>"

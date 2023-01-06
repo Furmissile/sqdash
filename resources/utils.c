@@ -96,9 +96,10 @@ struct discord_embed_footer* discord_set_embed_footer(char* text, char* icon_url
 }
 
 /* Returns total factor based on stat level and if it's a multiplier or incrementer */
-float generate_factor(float base_value, int stat_lv)
+float generate_factor(double base_value, int stat_lv)
 {
-  if (base_value == ACORN_MULTIPLIER || base_value == XP_MULTIPLIER)
+  printf("%0.1f, %d \n", base_value, stat_lv);
+  if (base_value == PROFICIENCY_VALUE)
     return (base_value * (stat_lv -1)) + (base_value * (stat_lv/STAT_EVOLUTION)) +1;
   else
     return base_value * (stat_lv -1);
@@ -315,17 +316,4 @@ void energy_regen()
 
   // wont disturb cooldown when info embed is sent
   player.main_cd = time(NULL) - ((time(NULL) - player.main_cd) % BASE_ENERGY_CD);
-}
-
-void signal_shutdown()
-{
-  discord_create_message(client, STATUS_CHANNEL,
-    &(struct discord_create_message)
-    {
-      .content = format_str(SIZEOF_DESCRIPTION, "The bot has gone "HELP_MARKER" **offline**!")
-    },
-    NULL);
-
-  discord_shutdown(client);
-  return;
 }

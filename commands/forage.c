@@ -7,34 +7,19 @@ This header handles the main embed and interactions associated with it
    - ENCOUNTER displays thumbnail, conflict, name, and options
    - Reward displays an updated description of what the player got
 
-  Changes since last push:
-    - Replaced materials with golden acorns
 */
 
 void factor_stats(void)
 {
   /* Multipliers do not need biome condition as they are just multiplied by 1 */
 
-  //factor proficiency stat into XP
-  rewards.xp *= generate_factor(XP_MULTIPLIER, player.stats.proficiency_lv);
+  //factor proficiency stat into XP and acorns
+  rewards.xp *= generate_factor(PROFICIENCY_VALUE, player.stats.proficiency_lv);
+  rewards.acorns *= generate_factor(PROFICIENCY_VALUE, player.stats.proficiency_lv);
 
-  //factor smell stat into acorns
-  rewards.acorns *= generate_factor(ACORN_MULTIPLIER, player.stats.smell_lv);
-}
-
-void factor_buff(void)
-{
-  /* Acorns and XP doesnt need to check if !0 because anything * 0 is still 0! */
-  if (player.buffs.smell_acorn > 0) {
-    rewards.acorns *= 1.5;
-    player.buffs.smell_acorn--;
-  }
-
-  if (player.buffs.proficiency_acorn > 0) {
-    rewards.xp *= 1.5;
-    player.buffs.proficiency_acorn--;
-  }
-
+  //factor stat luck into golden acorns
+  if (rewards.golden_acorns)
+    rewards.golden_acorns += generate_factor(LUCK_VALUE, player.stats.luck_lv);
 }
 
 /* Handle rewards based on item_type for main embed*/
@@ -81,6 +66,7 @@ void get_rewards(int item_type, char msg_id)
     rewards.acorns *= 2;
   }
 
+  // natural scaling
   rewards.acorns *= 1 + (0.2 * (player.level/PLAYER_EVOLUTION));
   rewards.xp *= 1 + (0.2 * (player.level/PLAYER_EVOLUTION));
 
@@ -89,7 +75,7 @@ void get_rewards(int item_type, char msg_id)
   if (item_type != TYPE_NO_ACORNS)
     factor_season(item_type);
 
-  factor_buff();
+  // factor_buff();
 
   // passive buff
   rewards.acorns *= (scurry.rank > SEED_NOT) ? ((BASE_COURAGE_MULT * (scurry.rank +1)) +1) : 1;
