@@ -4,12 +4,6 @@
 
 */
 
-/* Init Player for db */
-struct Player player = { 0 };
-struct Scurry scurry = { 0 };
-
-struct Rewards rewards = { 0 };
-
 enum DB_TUPLE {
   DB_USER_ID = 0,
   DB_LEVEL,
@@ -27,12 +21,22 @@ enum DB_TUPLE {
   DB_ACORN_COUNT,
   DB_CATNIP,
   DB_DAILY_CD,
-  // skip user id
-  DB_PROFICIENCY_LV = 17,
-  DB_STRENGTH_LV,
+
+  DB_SEEDS = 17,
+  DB_PINE_CONES,
+  DB_MOOSHRUMS,
+  DB_CACTUS_FLOWERS,
+  DB_JUNIPER_BERRIES,
+  DB_BLUEBERRIES,
+  DB_DARK_CHESTNUTS,
+
+  DB_SMELL_LV = 25,
+  DB_DEXTERITY_LV,
+  DB_ACUITY_LV,
   DB_LUCK_LV,
-  // skip user id
-  DB_SMELL_ACORN = 21,
+  DB_PROFICIENCY_LV,
+
+  DB_SMELL_ACORN = 31,
   DB_ENDURANCE_ACORN,
   DB_ACUITY_ACORN,
   DB_LUCK_ACORN,
@@ -75,8 +79,11 @@ enum ITEMS {
   ITEM_ENERGY,
   ITEM_GOLDEN_ACORN,
   ITEM_ACORN_COUNT,
+  ITEM_PINE_CONES,
+  ITEM_SEEDS,
   ITEM_XP,
   ITEM_STAHR,
+  ITEM_MATERIALS,
   ITEM_STOLEN_ACORNS,
   ITEM_SIZE
 };
@@ -88,81 +95,84 @@ struct File *items = (struct File[])
     .file_path = "Items/acorn.png",
 
     .emoji_name = "acorns",
-    .emoji_id = 1045028765392187402,
-
-    .stat_ptr = &player.acorns
+    .emoji_id = 1045028765392187402
   },
   {
     .formal_name = "Catnip",
     .file_path = "Items/catnip.png",
 
     .emoji_name = "catnip",
-    .emoji_id = 1052250368039452732,
-
-    .stat_ptr = &player.catnip
+    .emoji_id = 1052250368039452732
   },
   {
     .formal_name = "Courage",
     .file_path = "Scurry%20Utils/courage.png",
 
     .emoji_name = "courage",
-    .emoji_id = 1045555306832347147,
-
-    .stat_ptr = &scurry.courage
+    .emoji_id = 1045555306832347147
   },
   {
     .formal_name = "Energy",
     .file_path = "Items/energy.png",
 
     .emoji_name = "energy",
-    .emoji_id = 911642184397258752,
-
-    .stat_ptr = &player.energy
+    .emoji_id = 911642184397258752
   },
   {
     .formal_name = "Golden Acorn",
     .file_path = "Items/golden_acorn.png",
 
     .emoji_name = "golden_acorn",
-    .emoji_id = 1045032005420728430,
-
-    .stat_ptr = &player.golden_acorns
+    .emoji_id = 1045032005420728430
   },
   {
     .formal_name = "Acorn Count",
     .emoji_name = "acorn_count",
 
     .file_path = "Items/acorn_count.png",
-    .emoji_id = 1050407923823677502,
+    .emoji_id = 1050407923823677502
+  },
+  {
+    .formal_name = "Pine Cones",
+    .file_path = "Items/pine_cones.png",
 
-    .stat_ptr = &player.acorn_count
+    .emoji_name = "pine_cones",
+    .emoji_id = 1044620708996722708
+  },
+  {
+    .formal_name = "Seeds",
+    .file_path = "Items/seeds.png",
+
+    .emoji_name = "seeds",
+    .emoji_id = 1003457649221828610
   },
   {
     .formal_name = "XP",
     .file_path = "Items/xp.png",
 
     .emoji_name = "xp",
-    .emoji_id = 1001511753294815424,
-
-    .stat_ptr = &player.xp
+    .emoji_id = 1001511753294815424
   },
   {
     .formal_name = "Level",
     .file_path = "Item%20Types/stahr.png",
 
     .emoji_name = "stahr",
-    .emoji_id = 1045705606134251601,
+    .emoji_id = 1045705606134251601
+  },
+  {
+    .formal_name = "Materials",
+    .file_path = "Items/materials.png",
 
-    .stat_ptr = &player.level
+    .emoji_name = "materials",
+    .emoji_id = 1052960475534602330
   },
   {
     .formal_name = "Stolen Acorns",
     .file_path = "Items/stolen_acorn.png",
 
     .emoji_name = "stolen_acorns",
-    .emoji_id = 1055143210839720067,
-
-    .stat_ptr = &player.stolen_acorns
+    .emoji_id = 1055143210839720067
   }
 
 };
@@ -237,7 +247,7 @@ struct File *item_types = (struct File[])
 
 /* Buffs */
 enum BUFFS {
-  STRENGTH_ACORN,
+  ACUITY_ACORN,
   ENDURANCE_ACORN,
   LUCK_ACORN,
   PROFICIENCY_ACORN,
@@ -248,15 +258,13 @@ enum BUFFS {
 struct File *enchanted_acorns = (struct File[])
 {
   {
-    .formal_name = "Acorn of Strength",
+    .formal_name = "Acorn of Acuity",
 
     .file_path = "Enchanted%20Acorns/acuity_acorn.png",
-    .description = "*Refills some of HP*",
+    .description = "*+2 material earnings*",
 
     .emoji_name = "acuity_acorn",
-    .emoji_id = 1045027180549255208,
-
-    .stat_ptr = &player.buffs.acuity_acorn
+    .emoji_id = 1045027180549255208
   },
   {
     .formal_name = "Acorn of Endurance",
@@ -265,20 +273,16 @@ struct File *enchanted_acorns = (struct File[])
     .description = "*Refills some of energy*",
 
     .emoji_name = "edurance_acorn",
-    .emoji_id = 1045027181996286022,
-
-    .stat_ptr = &player.buffs.endurance_acorn
+    .emoji_id = 1045027181996286022
   },
   {
     .formal_name = "Acorn of Luck",
 
     .file_path = "Enchanted%20Acorns/luck_acorn.png",
-    .description = "*50% increased golden acorn earnings*",
+    .description = "*+2 biome material earnings*",
 
     .emoji_name = "luck_acorn",
-    .emoji_id = 1045027183334264872,
-
-    .stat_ptr = &player.buffs.luck_acorn
+    .emoji_id = 1045027183334264872
   },
   {
     .formal_name = "Acorn of Proficiency",
@@ -287,9 +291,7 @@ struct File *enchanted_acorns = (struct File[])
     .description = "*100% increased XP earnings*",
 
     .emoji_name = "proficiency_acorn",
-    .emoji_id = 1045027184475123813,
-
-    .stat_ptr = &player.buffs.proficiency_acorn
+    .emoji_id = 1045027184475123813
   },
   {
     .formal_name = "Acorn of Smell",
@@ -298,46 +300,42 @@ struct File *enchanted_acorns = (struct File[])
     .description = "*50% increase acorn earnings*",
 
     .emoji_name = "smell_acorn",
-    .emoji_id = 1045027185754390578,
-
-    .stat_ptr = &player.buffs.smell_acorn
+    .emoji_id = 1045027185754390578
   }
 };
 
 
 /* Squirrel Stats */
 enum SQUIRREL_STATS {
-  STAT_PROFICIENCY,
-  STAT_STRENGTH,
+  STAT_SMELL,
+  STAT_DEXTERITY,
+  STAT_ACUITY,
   STAT_LUCK,
+  STAT_PROFICIENCY,
   STAT_SIZE
 };
 
 struct File *stat_files = (struct File[])
 {
   {
-    .formal_name = "Proficiency",
-    .description = "*Multiplies XP "XP" and acorn "ACORNS" earnings*",
-
-    .stat_ptr = &player.stats.proficiency_lv,
-    .value_mult = PROFICIENCY_VALUE,
-    .price_mult = PROFICIENCY_FACTOR
+    .formal_name = "Smell", // GL
+    .description = "*Multiplies "ACORNS" acorn earnings*"
   },
   {
-    .formal_name = "Strength",
-    .description = "*Adds 50 max "HEALTH" HP*",
-
-    .stat_ptr = &player.stats.strength_lv,
-    .value_mult = STRENGTH_VALUE,
-    .price_mult = STRENGTH_FACTOR
+    .formal_name = "Dexterity", // SP
+    .description = "*Increases "PINE_CONES" pine cone earnings*"
   },
   {
-    .formal_name = "Luck",
-    .description = "*Increases golden acorn "GOLDEN_ACORNS" earnings*",
-
-    .stat_ptr = &player.stats.luck_lv,
-    .value_mult = LUCK_VALUE,
-    .price_mult = LUCK_FACTOR
+    .formal_name = "Acuity", // NE
+    .description = "*Increases "SEEDS" seed earnings*"
+  },
+  {
+    .formal_name = "Luck", // DG
+    .description = "*Increases biome material earnings*"
+  },
+  {
+    .formal_name = "Proficiency", // NP
+    .description = "*Multiplies "XP" XP earnings*"
   }
 };
 
@@ -368,11 +366,23 @@ struct File *evo_squirrels = (struct File[])
   }
 };
 
+/* Init Player for db */
+struct Player player = { 0 };
+struct Scurry scurry = { 0 };
+
+struct Rewards rewards = { 0 };
+
 /* Biomes */
 struct Biome *biomes = (struct Biome[])
 {
   { // GRASSLANDS
-    .biome_scene_path = "GRASSLANDS%20CONTENT/Utils/grasslands_scene.gif",
+    .biome_material = {
+      .formal_name = "Mooshrum",
+      .file_path = "GRASSLANDS%20CONTENT/Utils/mooshrum.png",
+
+      .emoji_name = "mooshrum",
+      .emoji_id = 1033828590464278559
+    },
 
     .biome_icon = {
       .formal_name = "Grasslands",
@@ -381,6 +391,14 @@ struct Biome *biomes = (struct Biome[])
       .emoji_name = "gl_icon",
       .emoji_id = 1007390631016017991
     },
+
+    .biome_scene_path = "GRASSLANDS%20CONTENT/Utils/grasslands_scene.gif",
+
+    .material_ptr = &player.materials.mooshrums,
+    .stat_ptr = &player.stats.smell_lv,
+
+    .stat_value_multiplier = ACORN_MULTIPLIER,
+    .stat_price_multiplier = ACORN_MULT_FACTOR,
 
     .encounters = (struct Encounter[]) { //encounters are listed in alphabetical order of their file name
       {
@@ -473,7 +491,13 @@ struct Biome *biomes = (struct Biome[])
   },
 
   {// SEEPING SANDS
-    .biome_scene_path = "SEEPING%20SANDS%20CONTENT/Utils/seeping_sands_scene.gif",
+    .biome_material = {
+      .formal_name = "Cactus Flower",
+      .file_path = "SEEPING%20SANDS%20CONTENT/Utils/cactus_flower.png",
+
+      .emoji_name = "cacus_flowers",
+      .emoji_id = 1006181928761839617
+    },
 
     .biome_icon = {
       .formal_name = "Seeping Sands",
@@ -482,6 +506,14 @@ struct Biome *biomes = (struct Biome[])
       .emoji_name = "sp_icon",
       .emoji_id = 1042082262566572153
     },
+
+    .biome_scene_path = "SEEPING%20SANDS%20CONTENT/Utils/seeping_sands_scene.gif",
+
+    .material_ptr = &player.materials.cactus_flowers,
+    .stat_ptr = &player.stats.dexterity_lv,
+
+    .stat_value_multiplier = PINE_CONE_INC,
+    .stat_price_multiplier = PINE_CONE_MULT_FACTOR,
 
     .encounters = (struct Encounter[]) {
       {

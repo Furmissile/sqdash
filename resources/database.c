@@ -29,7 +29,8 @@ struct Player load_player_struct(unsigned long user_id)
   {
     SQL_query(conn, "BEGIN; \
       insert into public.player values(%ld, 1, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, %ld); \
-      insert into public.stats values(%ld, 1, 1, 1); \
+      insert into public.materials values(%ld, 0, 0, 0, 0, 0, 0, 0); \
+      insert into public.stats values(%ld, 1, 1, 1, 1, 1); \
       insert into public.buffs values(%ld, 0, 0, 0, 0, 0); \
       COMMIT;", 
       user_id, time(NULL), user_id, user_id, user_id);
@@ -38,6 +39,7 @@ struct Player load_player_struct(unsigned long user_id)
   PQclear(search_player);
 
   search_player = SQL_query(conn, "select * from public.player \
+    join public.materials on player.user_id = materials.user_id \
     join public.stats on player.user_id = stats.user_id \
     join public.buffs on player.user_id = buffs.user_id \
     where player.user_id = %ld",
@@ -64,10 +66,22 @@ struct Player load_player_struct(unsigned long user_id)
     .catnip = strtoint( PQgetvalue(search_player, 0, DB_CATNIP) ),
     .daily_cd = strtobigint( PQgetvalue(search_player, 0, DB_DAILY_CD) ),
 
+    .materials = {
+      .pine_cones = strtoint( PQgetvalue(search_player, 0, DB_PINE_CONES) ),
+      .seeds = strtoint( PQgetvalue(search_player, 0, DB_SEEDS) ),
+      .mooshrums = strtoint( PQgetvalue(search_player, 0, DB_MOOSHRUMS) ),
+      .cactus_flowers = strtoint( PQgetvalue(search_player, 0, DB_CACTUS_FLOWERS) ),
+      .juniper_berries = strtoint( PQgetvalue(search_player, 0, DB_JUNIPER_BERRIES) ),
+      .blueberries = strtoint( PQgetvalue(search_player, 0, DB_BLUEBERRIES) ),
+      .dark_chestnuts = strtoint( PQgetvalue(search_player, 0, DB_DARK_CHESTNUTS) )
+    },
+
     .stats = {
-      .proficiency_lv = strtoint( PQgetvalue(search_player, 0, DB_PROFICIENCY_LV) ),
-      .strength_lv = strtoint( PQgetvalue(search_player, 0, DB_STRENGTH_LV) ),
-      .luck_lv = strtoint( PQgetvalue(search_player, 0, DB_LUCK_LV) )
+      .smell_lv = strtoint( PQgetvalue(search_player, 0, DB_SMELL_LV) ),
+      .dexterity_lv = strtoint( PQgetvalue(search_player, 0, DB_DEXTERITY_LV) ),
+      .acuity_lv = strtoint( PQgetvalue(search_player, 0, DB_ACUITY_LV) ),
+      .luck_lv = strtoint( PQgetvalue(search_player, 0, DB_LUCK_LV) ),
+      .proficiency_lv = strtoint( PQgetvalue(search_player, 0, DB_PROFICIENCY_LV) )
     },
 
     .buffs = {
@@ -169,15 +183,31 @@ void update_player_row(unsigned long user_id, struct Player player_res)
       player_res.color, player_res.main_cd, player_res.energy, player_res.golden_acorns, player_res.scurry_id,
       player_res.stolen_acorns,player_res.acorn_count, player_res.catnip, player_res.daily_cd,
       user_id);
+  
+  ADD_TO_BUFFER(sql_str, SIZEOF_SQL_COMMAND,
+    "update public.materials set \
+      pine_cones = %d, \
+      seeds = %d, \
+      mooshrums = %d, \
+      cactus_flowers = %d, \
+      juniper_berries = %d, \
+      blueberries = %d, \
+      dark_chestnuts = %d \
+    where user_id = %ld;",
+      player_res.materials.pine_cones, player_res.materials.seeds, player_res.materials.mooshrums,
+      player_res.materials.cactus_flowers, player_res.materials.juniper_berries, player_res.materials.blueberries,
+      player_res.materials.dark_chestnuts, user_id);
     
   ADD_TO_BUFFER(sql_str, SIZEOF_SQL_COMMAND,
     "update public.stats set \
-      proficiency_lv = %d, \
-      strength_lv = %d, \
-      luck_lv = %d \
+      smell_lv = %d, \
+      dexterity_lv = %d, \
+      acuity_lv = %d, \
+      luck_lv = %d, \
+      proficiency_lv = %d \
     where user_id = %ld;",
-      player_res.stats.proficiency_lv, player_res.stats.strength_lv, player_res.stats.luck_lv, 
-      user_id);
+      player_res.stats.smell_lv, player_res.stats.dexterity_lv, player_res.stats.acuity_lv, player_res.stats.luck_lv,
+      player_res.stats.proficiency_lv, user_id);
   
   ADD_TO_BUFFER(sql_str, SIZEOF_SQL_COMMAND,
     "update public.buffs set \

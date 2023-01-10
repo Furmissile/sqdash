@@ -13,13 +13,48 @@ void factor_stats(void)
 {
   /* Multipliers do not need biome condition as they are just multiplied by 1 */
 
-  //factor proficiency stat into XP and acorns
-  rewards.xp *= generate_factor(PROFICIENCY_VALUE, player.stats.proficiency_lv);
-  rewards.acorns *= generate_factor(PROFICIENCY_VALUE, player.stats.proficiency_lv);
+  //factor proficiency stat into XP
+  rewards.xp *= generate_factor(XP_MULTIPLIER, player.stats.proficiency_lv);
 
-  //factor stat luck into golden acorns
-  if (rewards.golden_acorns)
-    rewards.golden_acorns += generate_factor(LUCK_VALUE, player.stats.luck_lv);
+  //factor smell stat into acorns
+  rewards.acorns *= generate_factor(ACORN_MULTIPLIER, player.stats.smell_lv);
+
+  /* Only materials need biome condition as stat increments reward by default */
+  if (rewards.pine_cones && player.max_biome > GRASSLANDS)
+    rewards.pine_cones += generate_factor(PINE_CONE_INC, player.stats.dexterity_lv);
+
+  if (rewards.seeds && player.max_biome > SEEPING_SANDS)
+    rewards.seeds += generate_factor(SEEDS_INC, player.stats.acuity_lv);
+
+  if (rewards.biome_material && player.max_biome > DEATH_GRIP)
+    rewards.biome_material += generate_factor(BIOME_MATERIAL_INC, player.stats.luck_lv);
+}
+
+void factor_buff(void)
+{
+  /* Acorns and XP doesnt need to check if !0 because anything * 0 is still 0! */
+  if (player.buffs.smell_acorn > 0) {
+    rewards.acorns *= 1.5;
+    player.buffs.smell_acorn--;
+  }
+
+  if (player.buffs.proficiency_acorn > 0) {
+    rewards.xp *= 1.5;
+    player.buffs.proficiency_acorn--;
+  }
+
+  if (rewards.biome_material && player.buffs.luck_acorn > 0) {
+    rewards.biome_material += 2;
+    player.buffs.luck_acorn--;
+  }
+
+  if (rewards.pine_cones && rewards.seeds && player.buffs.acuity_acorn > 0) {
+    rewards.pine_cones += 2;
+    rewards.seeds += 2;
+
+    player.buffs.acuity_acorn--;
+  }
+
 }
 
 /* Handle rewards based on item_type for main embed*/
@@ -42,7 +77,9 @@ void get_rewards(int item_type, char msg_id)
       rewards = (struct Rewards) {
         .xp = genrand(100, 50), 
         .acorns = genrand(75, 25), 
-        .golden_acorns = genrand(25, 25)
+        .seeds = genrand(1, 3),
+        .pine_cones = genrand(1, 3),
+        .biome_material = (rand() % MAX_CHANCE < MAX_MATERIAL_CHANCE - (player.biome * 10) ) ? 1 : 0
       };
       break;
     case TYPE_ACORN_SACK:
@@ -66,7 +103,6 @@ void get_rewards(int item_type, char msg_id)
     rewards.acorns *= 2;
   }
 
-  // natural scaling
   rewards.acorns *= 1 + (0.2 * (player.level/PLAYER_EVOLUTION));
   rewards.xp *= 1 + (0.2 * (player.level/PLAYER_EVOLUTION));
 
@@ -75,15 +111,18 @@ void get_rewards(int item_type, char msg_id)
   if (item_type != TYPE_NO_ACORNS)
     factor_season(item_type);
 
-  // factor_buff();
+  factor_buff();
 
   // passive buff
   rewards.acorns *= (scurry.rank > SEED_NOT) ? ((BASE_COURAGE_MULT * (scurry.rank +1)) +1) : 1;
 
   player.xp += rewards.xp;
   player.acorns += rewards.acorns;
+  player.materials.seeds += rewards.seeds;
+  player.materials.pine_cones += rewards.pine_cones;
   player.golden_acorns += rewards.golden_acorns;
   player.catnip += rewards.catnip;
+  *biomes[player.biome].material_ptr += rewards.biome_material;
 }
 
 /* Load rewards onto main embed */
@@ -106,21 +145,30 @@ void generate_rewards(
           "+**%s** "XP" XP \n"
           "+**%s** "ACORNS" Acorns \n", 
           num_str(rewards.xp), num_str(rewards.acorns) );
-
-      if (rewards.golden_acorns)
-        ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION, "\n+**%s** "GOLDEN_ACORNS" Golden Acorns \n", num_str(rewards.golden_acorns));
-
       break;
     case TYPE_LOST_STASH:
       ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION,
           "+**%s** "XP" XP \n"
           "+**%s** "ACORNS" Acorns \n"
-          "**+%s** "GOLDEN_ACORNS" Golden Acorns \n",
-          num_str(rewards.xp), num_str(rewards.acorns), num_str(rewards.golden_acorns) );
+          "+**%s** "SEEDS" Seeds \n"
+          "+**%s** "PINE_CONES" Pine Cones \n",
+          num_str(rewards.xp), num_str(rewards.acorns), num_str(rewards.seeds), num_str(rewards.pine_cones) );
+
+      if (rewards.biome_material)
+      {
+        struct File biome_material_file = biomes[player.biome].biome_material;
+        ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION,
+            "\n+**%s** <:%s:%ld> %s \n", 
+            num_str(rewards.biome_material),
+            biome_material_file.emoji_name, biome_material_file.emoji_id, biome_material_file.formal_name);
+      }
       break;
     default:
       ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION, "You received no earnings! \n");
   }
+
+  if (rewards.golden_acorns)
+    ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION, "\n+**%s** "GOLDEN_ACORNS" Golden Acorns \n", num_str(rewards.golden_acorns));
 
   if (rewards.catnip)
     ADD_TO_BUFFER(buffer, SIZEOF_DESCRIPTION, "\n+**%s** "CATNIP" Catnip \n", num_str(rewards.catnip));

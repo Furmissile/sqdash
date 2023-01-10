@@ -2,8 +2,6 @@
 
   This file handles passive events
 
-  Changes since last push:
-    - golden acorns are added to rewards not set
 */
 
 void factor_season(int item_type)
@@ -12,7 +10,7 @@ void factor_season(int item_type)
 
   if (info->tm_mday < 7) {
     if (rand() % MAX_CHANCE > 80 && item_type != TYPE_ENCOUNTER_MSG )
-      rewards.golden_acorns += (item_type < TYPE_ACORN_MOUTHFUL) ? genrand(10, 5)
+      rewards.golden_acorns = (item_type < TYPE_ACORN_MOUTHFUL) ? genrand(10, 5)
           : (item_type < TYPE_LOST_STASH) ? genrand(15, 10) : genrand(25, 10);
     rewards.acorns *= SPRING_MULT;
   }
