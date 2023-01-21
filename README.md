@@ -2,6 +2,9 @@
 <img src="https://raw.githubusercontent.com/Furmissile/sqdash/main/Assets/Squirrel%20Dash%20Utils/git_welcome.gif" width="916" alt="Squirrel Dash">
 </div>
 
+# NOTICE
+This project has moved [here](https://github.com/Furmissile/squirrel) due to irrepairable damages made. This repo will no longer be maintained and will eventually be removed. It was thought it would be best to start fresh as compared to trying to repair this repo. Apologies for any inconvenience!
+
 # Welcome to Squirrel Dash!
 [![Discord](https://img.shields.io/static/v1?label=Discord&message=Support%20Server&color=5865F2)](https://discord.gg/Dd8Te3HmPW)
 
